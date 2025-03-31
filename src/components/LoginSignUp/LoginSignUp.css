@@ -4,3 +4,33 @@
   align-items: center !important;
   text-align: center !important;
 }
+
+.fade-in {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeInAnimation 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeInAnimation {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.custom-textfield .MuiOutlinedInput-root {
+  border-radius: 15px;
+}
+
+.custom-textfield .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #21399b !important;
+}
+
+.custom-textfield .MuiInputLabel-root.Mui-focused {
+  color: #21399b !important;
+}
