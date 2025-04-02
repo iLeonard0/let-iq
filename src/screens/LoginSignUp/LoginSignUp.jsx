@@ -1,10 +1,13 @@
 import React, { useState } from "react";
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Box, Button, TextField } from "@mui/material";
 import "./LoginSignUp.css";
 import logo from "/public/letiq-logo.png";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginSignUp() {
   const [nickname, setNickname] = useState("");
+  const navigate = useNavigate();
+
 
   const onKeyDown = (event) => {
     if (event.key === "Enter" && nickname.trim()) {
@@ -14,6 +17,7 @@ export default function LoginSignUp() {
 
   function saveUsername() {
     console.log("Nome salvo:", nickname);
+    navigate("/screens/Spin/Spin");
   }
 
   return (
@@ -24,11 +28,12 @@ export default function LoginSignUp() {
         flexDirection: "column",
         alignItems: "center",
         minHeight: "100vh",
+        textAlign: "center",
         backgroundColor: "#dcdcdc",
       }}
     >
       <Box>
-          <img src={logo} alt="Logo" style={{width: '300px', height: '320px'}}/> 
+        <img src={logo} alt="Logo" style={{ width: '300px', height: '320px' }} />
       </Box>
       <Box
         sx={{
@@ -46,7 +51,7 @@ export default function LoginSignUp() {
           sx={{
             color: "black",
             width: "100%",
-            maxWidth: "450px",
+            maxWidth: "425px",
             borderRadius: "15px",
             "& .MuiOutlinedInput-root": {
               borderRadius: "15px",
@@ -68,7 +73,7 @@ export default function LoginSignUp() {
               backgroundColor: "#21399b",
               marginTop: 1.5,
               width: "100%",
-              maxWidth: "450px",
+              maxWidth: "425px",
               borderRadius: "15px",
               "& .MuiOutlinedInput-root": {
                 borderRadius: "15px",
