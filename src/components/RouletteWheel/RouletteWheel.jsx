@@ -1,12 +1,12 @@
-import { Box, Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import "./RouletteWheel.css";
-import { useRouter } from "next/router";
+import { useNavigate } from "react-router-dom";
 
 export default function RouletteWheel() {
   const [selectedNumber, setSelectedNumber] = useState(null);
   const [spinning, setSpinning] = useState(false);
-  const router = useRouter();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const btn = document.getElementById("spin");
@@ -31,8 +31,12 @@ export default function RouletteWheel() {
   }, [spinning]);
 
   function determineNumber(degrees) {
-    const sectorSize = 360 / 8; 
+    const sectorSize = 360 / 8;
     return Math.floor(degrees / sectorSize) + 1;
+  }
+
+  function handleAvancar() {
+    navigate("/screens/GameScreen/GameScreen");
   }
 
   return (
@@ -50,9 +54,11 @@ export default function RouletteWheel() {
         <div className="eight">8</div>
       </div>
       {selectedNumber && (
-        <Box mt={2}>
-          <p>O número selecionado é: {selectedNumber}</p>
-          <Button variant="contained" color="primary" onClick={() => router.push("/next-page")}>Avançar</Button>
+        <Box mt={2} display='flex' justifyContent='center' flexDirection='column'>
+          <Typography variant="body2" textAlign='center'>
+            O número selecionado é: {selectedNumber}
+          </Typography>
+          <Button sx={{mt: 1}} variant="contained" color="primary" onClick={() => handleAvancar()}>Avançar</Button>
         </Box>
       )}
     </div>
