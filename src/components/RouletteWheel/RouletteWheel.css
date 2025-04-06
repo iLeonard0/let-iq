@@ -2,16 +2,6 @@
 	box-sizing:border-box;
 }
 
-body{
-	margin:0;
-	padding:0;
-	display:flex;
-	align-items:center;
-	justify-content: center;
-	height:100vh;
-	overflow:hidden;
-}
-
 .container{
 	width:500px;
 	height:500px;
@@ -25,7 +15,7 @@ body{
 
 .container div{
 	height:50%;
-	width:200px;
+	width:350px;
 	position: absolute;
 	clip-path: polygon(100% 0 , 50% 100% , 0 0 );
 	transform:translateX(-50%);
@@ -38,46 +28,34 @@ body{
 	font-weight:bold;
 	font-family:sans-serif;
 	color:#fff;
-	left:135px;
+	left:60px;
 }
 
 .container .one{
 	background-color: #3f51b5;
-	left:50%;
+	transform: rotate(0deg);
 }
-.container .two{
-	background-color: #ff9800;
-	transform: rotate(45deg);
+.container .two {
+  background-color: #085862;
+  transform: rotate(72deg);
 }
-.container .three{
-	background-color: #e91e63;
-	transform:rotate(90deg);
+.container .three {
+  background-color: #e91eb3;
+  transform: rotate(144deg);
 }
-.container .four{
-	background-color: #4caf50;
-	transform: rotate(135deg);
+.container .four {
+  background-color: #8b4caf;
+  transform: rotate(216deg);
 }
-.container .five{
-	background-color: #009688;
-	transform: rotate(180deg);
-}
-.container .six{
-	background-color: #795548;
-	transform: rotate(225deg);
-}
-.container .seven{
-	background-color: #9c27b0;
-	transform: rotate(270deg);
-}
-.container .eight{
-	background-color: #f44336;
-	transform: rotate(315deg);
-}
+.container .five {
+  background-color: #009688;
+  transform: rotate(288deg);
+}	
+
 
 .arrow{
 	position: relative;
 	top:0;
-	left:50%;
 	transform: translateX(-50%);
 	color:#414141;
 }
@@ -106,5 +84,11 @@ body{
 	cursor: pointer;
 	outline:none;
 	letter-spacing: 1px;
-	margin-top: 30px;
+	margin-top: 20px;
+}
+
+.container img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
 }

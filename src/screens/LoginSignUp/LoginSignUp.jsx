@@ -38,7 +38,7 @@ export default function LoginSignUp() {
       <Box
         sx={{
           width: "100%",
-          maxWidth: "450px",
+          maxWidth: "425px",
         }}
       >
         <TextField
@@ -51,7 +51,7 @@ export default function LoginSignUp() {
           sx={{
             color: "black",
             width: "100%",
-            maxWidth: "425px",
+            minWidth: "425px",
             borderRadius: "15px",
             "& .MuiOutlinedInput-root": {
               borderRadius: "15px",
@@ -63,7 +63,7 @@ export default function LoginSignUp() {
         <Box
           className="fade-in"
           width="100%"
-          maxWidth="450px"
+          maxWidth="425px"
           display="flex"
           justifyContent="center"
         >
@@ -73,7 +73,7 @@ export default function LoginSignUp() {
               backgroundColor: "#21399b",
               marginTop: 1.5,
               width: "100%",
-              maxWidth: "425px",
+              minWidth: "425px",
               borderRadius: "15px",
               "& .MuiOutlinedInput-root": {
                 borderRadius: "15px",
