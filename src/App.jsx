@@ -12,9 +12,10 @@ function App() {
   return (
     <Router>
       <CssBaseline />
+      <link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet" />
       <Routes>
         <Route path='/' element={<LoginSignUp />} />
-        <Route path='/screens/Spin/Spin' element={<Spin/>}/>
+        <Route path='/screens/Spin/Spin' element={<Spin />} />
         <Route path='/screens/GameScreen/GameScreen' element={<GameScreen questoesJson={questoesJson[0]} />} />
       </Routes>
     </Router>

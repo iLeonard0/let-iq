@@ -6,7 +6,7 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import Header from "../../components/header/Header";
@@ -47,6 +47,7 @@ export default function GameScreen() {
     }, 1000);
 
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentIndex]);
 
   const handleOptionClick = (key) => {
@@ -65,13 +66,13 @@ export default function GameScreen() {
       setSelectedOption(null);
       setAnswered(false);
     } else {
-      setOpenDialog(true); 
+      setOpenDialog(true);
     }
   };
 
   const handleReturnToRoleta = () => {
     setOpenDialog(false);
-    navigate("/screens/Spin/Spin"); 
+    navigate("/screens/Spin/Spin");
   };
 
   return (
@@ -92,7 +93,6 @@ export default function GameScreen() {
           <Box
             sx={{
               backgroundColor: "#ffebee",
-              border: "1px solid #f44336",
               padding: 4,
               borderRadius: 4,
               textAlign: "center",
@@ -138,7 +138,18 @@ export default function GameScreen() {
             >
               <Typography variant="h6">{perguntaAtual.pergunta}</Typography>
             </Box>
-
+            {answered && !timeoutReached && (
+              <Typography
+                variant="h3"
+                sx={{
+                  mt: 4,
+                  fontFamily: 'Titan One',
+                  color: selectedOption === respostaCorreta ? "#4caf50" : "#f44336",
+                }}
+              >
+                {selectedOption === respostaCorreta ? "CORRETO!" : "VOCÊ ERROU!"}
+              </Typography>
+            )}
             <Box
               sx={{
                 display: "flex",
@@ -146,7 +157,7 @@ export default function GameScreen() {
                 gap: 2,
                 width: "100%",
                 maxWidth: 700,
-                mt: 4,
+                mt: 4
               }}
             >
               {Object.entries(alternativas)
@@ -206,7 +217,7 @@ export default function GameScreen() {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleReturnToRoleta} variant="contained" sx={{backgroundColor: '#21399b'}}>
+          <Button onClick={handleReturnToRoleta} variant="contained" sx={{ backgroundColor: '#21399b' }}>
             Voltar
           </Button>
         </DialogActions>
