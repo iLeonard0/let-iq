@@ -1,26 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { Person } from "@mui/icons-material";
 import { Avatar, Box, Typography } from "@mui/material";
-import PersonIcon from "@mui/icons-material/Person";
 
-export default function Header({ points }) {
-  const [timer, setTimer] = useState(30);
-
-  useEffect(() => {
-    setTimer(30);
-
-    const interval = setInterval(() => {
-      setTimer((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
+// Header.jsx
+export default function Header({ points, timer }) {
   return (
     <Box
       sx={{
@@ -28,11 +10,11 @@ export default function Header({ points }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        p:1
+        p: 1,
       }}
     >
       <Avatar sx={{ bgcolor: "#44479C" }}>
-        <PersonIcon />
+        <Person />
       </Avatar>
 
       <Box
