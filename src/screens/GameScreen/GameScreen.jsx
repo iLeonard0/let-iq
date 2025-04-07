@@ -1,118 +1,127 @@
 import { Box, Typography, Button, Divider } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import Header from "../../components/header/Header";
+import { questoesJson } from "../../json/questoes";
 
 export default function GameScreen() {
+  const { disciplina, perguntas } = questoesJson[0];
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [answered, setAnswered] = useState(false);
+  const [points, setPoints] = useState(0);
+
+  const perguntaAtual = perguntas[currentIndex];
+  const alternativas = perguntaAtual.alternativas;
+  const respostaCorreta = alternativas.respostaCorreta;
+
+  const handleOptionClick = (key) => {
+    if (!answered) {
+      setSelectedOption(key);
+      setAnswered(true);
+
+      if (key === respostaCorreta) {
+        setPoints((prev) => prev + 10);
+      }
+    }
+  };
+
+  const handleNext = () => {
+    if (currentIndex < perguntas.length - 1) {
+      setCurrentIndex((prev) => prev + 1);
+      setSelectedOption(null);
+      setAnswered(false);
+    } else {
+      alert("Fim das perguntas!");
+    }
+  };
+
   return (
     <Box sx={{ height: "100vh", display: "flex", flexDirection: "column", backgroundColor: "#dcdcdc" }}>
-      <Box sx={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 10 }}>
-        <Header />
-        <Box sx={{ px: 2, flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", mt: 4 }}>
-          <Typography variant="h6" color="textSecondary" gutterBottom>
-            Banco de dados
+      <Header points={points} />
+      <Box
+        sx={{
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          px: 2,
+        }}
+      >
+        <Box sx={{ px: 2, mb: 2, display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <Typography variant="h5" color="textSecondary">
+            {disciplina}
           </Typography>
         </Box>
+        <Box
+          sx={{
+            backgroundColor: "white",
+            borderRadius: 8,
+            boxShadow: 3,
+            minHeight: "150px",
+            p: 3,
+            width: "100%",
+            maxWidth: 700,
+            textAlign: "center",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Typography variant="h6">{perguntaAtual.pergunta}</Typography>
+        </Box>
 
-        <Box sx={{mt: 1}} display='flex' justifyContent='center' alignItems='center' flexDirection='column'> 
-          <Box sx={{ position: "relative", mb: 4 }}>
-            <Box
-              sx={{
-                position: "relative",
-                backgroundColor: "white",
-                borderRadius: 8,
-                boxShadow: 3,
-                minWidth: "800px",
-                minHeight: "150px",
-                p: 3,
-                width: "100%",
-                maxWidth: 600,
-                textAlign: "center",
-                zIndex: 2,
-                display: 'flex',
-                justifyContent: 'center',
-                alignContent: 'center',
-              }}
-            >
-              <Typography variant="h6" display='flex' justifyContent='center' alignItems='center'>
-                Como declarar uma variável mutável em JavaScript ?
-              </Typography>
-            </Box>
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 2,
-              width: "100%",
-              maxWidth: 600,
-              mt: 6,
-            }}
-          >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            width: "100%",
+            maxWidth: 700,
+            mt: 4,
+          }}
+        >
+          {Object.entries(alternativas)
+            .filter(([key]) => key !== "respostaCorreta")
+            .map(([key, texto]) => (
+              <Button
+                key={key}
+                variant="contained"
+                disableElevation
+                onClick={() => handleOptionClick(key)}
+                sx={{
+                  backgroundColor: !answered
+                    ? "#fff"
+                    : key === respostaCorreta
+                      ? "#4caf50"
+                      : selectedOption === key
+                        ? "#f44336"
+                        : "#fff",
+                  color: "#000",
+                  borderRadius: 3,
+                  textTransform: "none",
+                  boxShadow: "none",
+                  justifyContent: "flex-start",
+                  height: 48,
+                  px: 2,
+                }}
+              >
+                {key.toUpperCase()}) {texto}
+              </Button>
+            ))}
+
+          {answered && (
             <Button
               variant="contained"
-              disableElevation
-              sx={{
-                backgroundColor: "#fff",
-                color: "#000",
-                borderRadius: 3,
-                textTransform: "none",
-                boxShadow: "none",
-                justifyContent: "center",
-                height: 48,
-              }}
+              onClick={handleNext}
+              sx={{ mt: 2, borderRadius: 3, backgroundColor: "#2A2E5D", color: "white" }}
             >
-              const x = 10;
+              Próxima
             </Button>
+          )}
 
-            <Button
-              variant="contained"
-              disableElevation
-              sx={{
-                backgroundColor: "#fff",
-                color: "#000",
-                borderRadius: 3,
-                textTransform: "none",
-                boxShadow: "none",
-                justifyContent: "center",
-                height: 48,
-              }}
-            >
-              let x = 10;
-            </Button>
-
-            <Button
-              variant="contained"
-              disableElevation
-              sx={{
-                backgroundColor: "#fff",
-                color: "#000",
-                borderRadius: 3,
-                textTransform: "none",
-                boxShadow: "none",
-                justifyContent: "center",
-                height: 48,
-              }}
-            >
-              immutable x = 10;
-            </Button>
-
-            <Button
-              variant="contained"
-              disableElevation
-              sx={{
-                backgroundColor: "#fff",
-                color: "#000",
-                borderRadius: 3,
-                textTransform: "none",
-                boxShadow: "none",
-                justifyContent: "center",
-                height: 48,
-              }}
-            >
-              fixed x = 10;
-            </Button>
-            <Divider sx={{ color: 'black' }} />
-          </Box>
+          <Divider sx={{ mt: 2 }} />
         </Box>
       </Box>
     </Box>

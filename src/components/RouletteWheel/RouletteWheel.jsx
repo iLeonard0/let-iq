@@ -53,7 +53,7 @@ export default function RouletteWheel() {
       {selectedDiscipline && (
         <Box mt={2} display='flex' justifyContent='center' flexDirection='column'>
           <Typography variant="h6" textAlign='center'>
-            A disciplina sorteada é: {selectedDiscipline}
+            A disciplina sorteada é: Banco de Dados
           </Typography>
           <Button sx={{ mt: 1, backgroundColor: "#2A2E5D" }} variant="contained" onClick={handleAvancar}>
             Avançar
