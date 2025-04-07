@@ -65,13 +65,13 @@ export default function GameScreen() {
       setSelectedOption(null);
       setAnswered(false);
     } else {
-      setOpenDialog(true); // <-- Mostra o Dialog no fim
+      setOpenDialog(true); 
     }
   };
 
   const handleReturnToRoleta = () => {
     setOpenDialog(false);
-    navigate("/"); // <-- ajuste o caminho se sua tela da roleta for outro
+    navigate("/screens/Spin/Spin"); 
   };
 
   return (
@@ -195,15 +195,19 @@ export default function GameScreen() {
       </Box>
 
       <Dialog open={openDialog} onClose={handleReturnToRoleta}>
-        <DialogTitle>Fim do Jogo!</DialogTitle>
+        <DialogTitle>
+          <Typography variant="h6">
+            Fim de Jogo!
+          </Typography>
+        </DialogTitle>
         <DialogContent>
           <Typography variant="body1" sx={{ mt: 1 }}>
-            Sua pontuação final foi <strong>{points} pontos</strong>.
+            Sua pontuação final foi de <strong>{points} pontos</strong>.
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleReturnToRoleta} variant="contained" color="primary">
-            Voltar para a Roleta
+          <Button onClick={handleReturnToRoleta} variant="contained" sx={{backgroundColor: '#21399b'}}>
+            Voltar
           </Button>
         </DialogActions>
       </Dialog>
