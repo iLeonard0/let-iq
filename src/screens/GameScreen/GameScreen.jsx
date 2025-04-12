@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -8,15 +9,14 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../../components/header/Header";
-import { questoesJson } from "../../json/questoes";
-import { useNavigate } from "react-router-dom";
 
 export default function GameScreen() {
-  const { disciplina, perguntas } = questoesJson[0];
+  const location = useLocation();
   const navigate = useNavigate();
-
+  const { disciplina, perguntas } = location.state.questoes;
+  const questoes = location.state?.questoes;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [answered, setAnswered] = useState(false);
@@ -47,8 +47,7 @@ export default function GameScreen() {
     }, 1000);
 
     return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIndex]);
+  }, [currentIndex, answered]);
 
   const handleOptionClick = (key) => {
     if (!answered) {
@@ -75,10 +74,18 @@ export default function GameScreen() {
     navigate("/screens/Spin/Spin");
   };
 
+  if (!questoes) {
+    return (
+      <Typography variant="h5" color="error">
+        Erro: Nenhuma questão foi fornecida.
+      </Typography>
+    );
+  }
+
   return (
     <Box sx={{ height: "100vh", display: "flex", flexDirection: "column", backgroundColor: "#dcdcdc" }}>
       <Header points={points} timer={timer} />
-
+      
       <Box
         sx={{
           flexGrow: 1,

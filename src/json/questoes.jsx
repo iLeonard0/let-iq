@@ -311,7 +311,7 @@ export const questoesJson =
       ]
     },
     {
-      "disciplina": "Ciber Segurança",
+      "disciplina": "Cibersegurança",
       "perguntas": [
         {
           "pergunta": "O que é phishing?",

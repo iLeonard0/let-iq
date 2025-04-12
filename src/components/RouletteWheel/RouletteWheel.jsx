@@ -1,7 +1,8 @@
 import { Box, Button, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import "./RouletteWheel.css";
 import { useNavigate } from "react-router-dom";
+import { questoesJson } from "../../json/questoes";
+import "./RouletteWheel.css";
 
 export default function RouletteWheel() {
   const [selectedDiscipline, setSelectedDiscipline] = useState(null);
@@ -11,7 +12,7 @@ export default function RouletteWheel() {
   useEffect(() => {
     const btn = document.getElementById("spin");
     const container = document.querySelector(".container");
-    let number = Math.ceil(Math.random() * 1000);
+    let number = Math.ceil(Math.random() * 2000);
 
     btn.onclick = function () {
       if (!spinning) {
@@ -31,12 +32,25 @@ export default function RouletteWheel() {
   }, [spinning]);
 
   function determineDiscipline(degrees) {
-    const sectorSize = 360 / 8;
-    return Math.floor(degrees / sectorSize) + 1;
+
+    const normalizedDegrees = degrees % 360;
+    const sectorSize = 360 / 5; 
+    const sectors = [
+      "Desenvolvimento Mobile e Web",
+      "Banco de Dados",
+      "Cibersegurança",
+      "Linguagens de Programação",
+      "História da Programação",
+    ];
+  
+    return sectors[Math.floor(normalizedDegrees / sectorSize)];
   }
 
   function handleAvancar() {
-    navigate("/screens/GameScreen/GameScreen");
+    if (selectedDiscipline) {
+      const questoes = questoesJson.find(q => q.disciplina === selectedDiscipline);
+      navigate("/screens/GameScreen/GameScreen", { state: { questoes } });
+    }
   }
 
   return (
@@ -53,7 +67,7 @@ export default function RouletteWheel() {
       {selectedDiscipline && (
         <Box mt={2} display='flex' justifyContent='center' flexDirection='column'>
           <Typography variant="h6" textAlign='center'>
-            A disciplina sorteada é: Banco de Dados
+            A disciplina sorteada é: {selectedDiscipline}
           </Typography>
           <Button sx={{ mt: 1, backgroundColor: "#2A2E5D" }} variant="contained" onClick={handleAvancar}>
             Avançar
