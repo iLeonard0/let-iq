@@ -47,7 +47,8 @@ export default function GameScreen() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [currentIndex, answered]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIndex]);
 
   const handleOptionClick = (key) => {
     if (!answered) {
