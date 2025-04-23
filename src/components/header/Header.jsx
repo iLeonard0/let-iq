@@ -1,39 +1,33 @@
-import { Person } from "@mui/icons-material";
-import { Avatar, Box, Typography } from "@mui/material";
+import React from "react";
+import { AppBar, Toolbar, Typography, Box } from "@mui/material";
 
-// Header.jsx
-export default function Header({ points, timer }) {
+export default function Header() {
   return (
-    <Box
+    <AppBar
+      position="static"
       sx={{
-        backgroundColor: "#2A2E5D",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        p: 1,
+        backgroundColor: "#FFFFFF",
+        boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+        padding: "0.5rem 1rem",
       }}
     >
-      <Avatar sx={{ bgcolor: "#44479C" }}>
-        <Person />
-      </Avatar>
-
-      <Box
+      <Toolbar
         sx={{
-          backgroundColor: "#44479C",
-          color: "white",
-          paddingX: 3,
-          paddingY: 0.5,
-          borderRadius: 2,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
-        <Typography variant="h6" align="center">
-          {points}
-        </Typography>
-      </Box>
-
-      <Typography variant="h6" color="white">
-        {timer}’
-      </Typography>
-    </Box>
+        <Box
+          component="img"
+          src="/public/letiq-logo.png"
+          alt="LetIQ Logo"
+          sx={{
+            height: "70px",
+            width: "auto",
+          }}
+        />
+      </Toolbar>
+    </AppBar>
   );
 }
