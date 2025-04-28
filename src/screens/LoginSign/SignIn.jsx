@@ -1,15 +1,13 @@
 import React, { useState } from "react";
-import { Box, Button, TextField, Typography, IconButton, InputAdornment, Paper } from "@mui/material";
+import { Box, Button, TextField, Typography, Link, IconButton, InputAdornment, Paper } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import "./LoginSignUp.css";
+import "./SignIn.css";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/header/Header";
 
 export default function LoginSignUp() {
   const [nickname, setNickname] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
@@ -17,10 +15,10 @@ export default function LoginSignUp() {
     setShowPassword((prev) => !prev);
   };
 
-  const isButtonDisabled = !(nickname.trim() && email.trim() && password.trim() && confirmPassword.trim() && password === confirmPassword);
+  const isButtonDisabled = !(nickname.trim() && password.trim());
 
-  function handleSignUp() {
-    console.log("Cadastro realizado:", { nickname, email });
+  function saveUsername() {
+    console.log("Nome salvo:", nickname);
     navigate("/screens/Spin/Spin");
   }
 
@@ -60,7 +58,7 @@ export default function LoginSignUp() {
             fontWeight: "700",
             textAlign: "center",
           }}>
-            Cadastrar-se
+            Fazer Login
           </Typography>
           <Box
             sx={{
@@ -75,6 +73,7 @@ export default function LoginSignUp() {
               marginBottom: 0,
             }}>
               Nome de usuário
+
             </Typography>
             <TextField
               variant="outlined"
@@ -94,63 +93,14 @@ export default function LoginSignUp() {
               fontWeight: "bold",
               marginBottom: 0,
             }}>
-              Email
-            </Typography>
-            <TextField
-              variant="outlined"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="custom-textfield"
-              sx={{
-                width: "100%",
-                marginBottom: 2,
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: "5px",
-                },
-              }}
-            />
-            <Typography variant="h6" gutterBottom sx={{
-              display: "flex",
-              fontWeight: "bold",
-              marginBottom: 0,
-            }}>
               Senha
+
             </Typography>
             <TextField
               type={showPassword ? "text" : "password"}
               variant="outlined"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="custom-textfield"
-              sx={{
-                width: "100%",
-                marginBottom: 2,
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: "5px",
-                },
-              }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={togglePasswordVisibility} edge="end">
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <Typography variant="h6" gutterBottom sx={{
-              display: "flex",
-              fontWeight: "bold",
-              marginBottom: 0,
-            }}>
-              Confirmar Senha
-            </Typography>
-            <TextField
-              type={showPassword ? "text" : "password"}
-              variant="outlined"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
               className="custom-textfield"
               sx={{
                 width: "100%",
@@ -169,8 +119,20 @@ export default function LoginSignUp() {
               }}
             />
           </Box>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: 2,
+              marginTop: 0
+            }}
+          >
+            <Link href="/screens/LoginSignUp/LoginSignUp" underline="hover">
+              Forgot your password?
+            </Link>
+          </Box>
           <Button
-            onClick={handleSignUp}
+            onClick={saveUsername}
             disabled={isButtonDisabled}
             sx={{
               backgroundColor: isButtonDisabled ? "#d3d3d3" : "#21399b",
@@ -188,8 +150,48 @@ export default function LoginSignUp() {
             }}
             variant="contained"
           >
-            Cadastrar-se
+            Fazer Login
           </Button>
+          <Box sx={{
+            marginTop: 3,
+          }}>
+            <hr className="login-divider" />
+            <span className="login-or">OU</span>
+          </Box>
+          <Box sx={{marginTop: 3}}>
+            <Button
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                position: "relative",
+                width: "100%",
+                margin: "0.25rem 0px",
+                borderRadius: "4px",
+                color: "rgb(0, 0, 0)",
+                border: "1px solid rgb(0, 0, 0)",
+                backgroundColor: "rgb(255, 255, 255)",
+                boxShadow: "none",
+                padding: "0.5rem",
+                lineHeight: "1rem",
+                height: "auto",
+                fontWeight: "500",
+                textTransform: "none",
+                fontSize: "1rem",
+                transition: "background-color 0.3s ease, box-shadow 0.3s ease",
+                "&:hover": {
+                  backgroundColor: "rgb(245, 245, 245)",
+                  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+                },
+              }}
+            >
+              <img
+                src="/public/logo-google-login.png"
+                alt="Google Logo"
+                style={{ width: "20px", height: "20px", marginRight: "auto" }}
+              />
+              <span style={{ flex: 1, textAlign: "center" }}>Continuar com o Google</span>
+            </Button>
+          </Box>
         </Paper>
       </Box>
     </>
