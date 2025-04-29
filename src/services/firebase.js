@@ -1,7 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
-
 const firebaseConfig = {
   apiKey: "AIzaSyBcVorjdsaeHjQkgLejDKM69WMvRZ6RqEY",
   authDomain: "letiq-quizapp.firebaseapp.com",

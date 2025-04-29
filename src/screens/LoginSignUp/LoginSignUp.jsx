@@ -4,9 +4,10 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import "./LoginSignUp.css";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/header/Header";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../services/firebase";
 
 export default function LoginSignUp() {
-  const [nickname, setNickname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -17,11 +18,20 @@ export default function LoginSignUp() {
     setShowPassword((prev) => !prev);
   };
 
-  const isButtonDisabled = !(nickname.trim() && email.trim() && password.trim() && confirmPassword.trim() && password === confirmPassword);
+  const isButtonDisabled = !(email.trim() && password.trim() && confirmPassword.trim() && password === confirmPassword);
 
-  function handleSignUp() {
-    console.log("Cadastro realizado:", { nickname, email });
-    navigate("/screens/Spin/Spin");
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      alert("As senhas não coincidem. Tente novamente.");
+      return;
+    }
+    try {
+      await createUserWithEmailAndPassword(auth, email, password)
+    } catch (error) {
+      console.error("Erro ao criar conta:", error);
+      navigate("/");
+    }
   }
 
   return (
@@ -66,29 +76,9 @@ export default function LoginSignUp() {
             sx={{
               width: "100%",
               marginBottom: 2,
-              marginTop: 4,
+              marginTop: 2,
             }}
           >
-            <Typography variant="h6" gutterBottom sx={{
-              display: "flex",
-              fontWeight: "bold",
-              marginBottom: 0,
-            }}>
-              Nome de usuário
-            </Typography>
-            <TextField
-              variant="outlined"
-              value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
-              className="custom-textfield"
-              sx={{
-                width: "100%",
-                marginBottom: 2,
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: "5px",
-                },
-              }}
-            />
             <Typography variant="h6" gutterBottom sx={{
               display: "flex",
               fontWeight: "bold",
@@ -154,6 +144,7 @@ export default function LoginSignUp() {
               className="custom-textfield"
               sx={{
                 width: "100%",
+                marginBottom: 2,
                 "& .MuiOutlinedInput-root": {
                   borderRadius: "5px",
                 },

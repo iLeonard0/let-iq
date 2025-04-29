@@ -4,6 +4,8 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import "./SignIn.css";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/header/Header";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../services/firebase";
 
 export default function LoginSignUp() {
   const [nickname, setNickname] = useState("");
@@ -15,12 +17,19 @@ export default function LoginSignUp() {
     setShowPassword((prev) => !prev);
   };
 
-  const isButtonDisabled = !(nickname.trim() && password.trim());
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      await signInWithEmailAndPassword(auth, nickname, password);
+      console.log("Login bem-sucedido!");
+      navigate("/screens/Spin/Spin"); 
+    } catch (error) {
+      console.error("Erro ao fazer login:", error);
+      alert("Erro ao fazer login. Verifique suas credenciais e tente novamente.");
+    }
+  };
 
-  function saveUsername() {
-    console.log("Nome salvo:", nickname);
-    navigate("/screens/Spin/Spin");
-  }
+  const isButtonDisabled = !(nickname.trim() && password.trim());
 
   return (
     <>
@@ -132,7 +141,7 @@ export default function LoginSignUp() {
             </Link>
           </Box>
           <Button
-            onClick={saveUsername}
+            onClick={handleLogin} 
             disabled={isButtonDisabled}
             sx={{
               backgroundColor: isButtonDisabled ? "#d3d3d3" : "#21399b",
@@ -152,12 +161,6 @@ export default function LoginSignUp() {
           >
             Fazer Login
           </Button>
-          <Box sx={{
-            marginTop: 3,
-          }}>
-            <hr className="login-divider" />
-            <span className="login-or">OU</span>
-          </Box>
           <Box sx={{marginTop: 3}}>
             <Button
               sx={{
@@ -189,7 +192,7 @@ export default function LoginSignUp() {
                 alt="Google Logo"
                 style={{ width: "20px", height: "20px", marginRight: "auto" }}
               />
-              <span style={{ flex: 1, textAlign: "center" }}>Continuar com o Google</span>
+              Continuar com o Google
             </Button>
           </Box>
         </Paper>
