@@ -12,7 +12,7 @@ export default function Spin() {
       <Box sx={{ pt: "80px", textAlign: "center" }}>
         <Typography variant="h6" sx={{ mb: 0 }}>
           Gire a roleta para sortear um tópico:
-        </Typography>
+        </Typography>ssssssss
 
         <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
           <RouletteWheel />
