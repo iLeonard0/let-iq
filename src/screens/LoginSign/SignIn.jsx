@@ -190,7 +190,7 @@ export default function LoginSignUp() {
               <img
                 src="/public/logo-google-login.png"
                 alt="Google Logo"
-                style={{ width: "20px", height: "20px", marginRight: "auto" }}
+                style={{ width: "20px", height: "20px", marginRight: "10px" }}
               />
               Continuar com o Google
             </Button>
