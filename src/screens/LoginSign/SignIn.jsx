@@ -22,7 +22,7 @@ export default function LoginSignUp() {
     try {
       await signInWithEmailAndPassword(auth, nickname, password);
       console.log("Login bem-sucedido!");
-      navigate("/screens/Spin/Spin"); 
+      navigate("/screens/QuizEditor/QuizEditor"); 
     } catch (error) {
       console.error("Erro ao fazer login:", error);
       alert("Erro ao fazer login. Verifique suas credenciais e tente novamente.");

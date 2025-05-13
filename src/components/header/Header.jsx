@@ -4,11 +4,12 @@ import { AppBar, Toolbar, Typography, Box } from "@mui/material";
 export default function Header() {
   return (
     <AppBar
-      position="static"
+      position="fixed"
       sx={{
         backgroundColor: "#FFFFFF",
         boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
         padding: "0.5rem 1rem",
+        zIndex: 1201, // Ensures it stays above other components
       }}
     >
       <Toolbar

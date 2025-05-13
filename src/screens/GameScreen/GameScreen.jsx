@@ -72,7 +72,7 @@ export default function GameScreen() {
 
   const handleReturnToRoleta = () => {
     setOpenDialog(false);
-    navigate("/screens/Spin/Spin");
+    navigate("/screens/QuizEditor/QuizEditor");
   };
 
   if (!questoes) {
