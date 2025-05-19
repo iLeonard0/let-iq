@@ -34,7 +34,7 @@ export default function LoginSignUp() {
     try {
       await signInWithEmailAndPassword(auth, nickname, password);
       console.log("Login bem-sucedido!");
-      navigate("/screens/Spin/Spin");
+      navigate("/screens/QuizEditor/QuizEditor");
     } catch (error) {
       console.error("Erro ao fazer login:", error);
       alert(
@@ -47,7 +47,7 @@ export default function LoginSignUp() {
     e.preventDefault();
     try {
       await loginWithGoogle();
-      navigate("/screens/Spin/Spin");
+      navigate("/screens/QuizEditor/QuizEditor");
     } catch (error) {
       console.error("Erro ao fazer login:", error);
       alert(
