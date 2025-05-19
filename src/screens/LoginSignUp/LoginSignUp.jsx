@@ -43,10 +43,11 @@ export default function LoginSignUp() {
           justifyContent: "center",
           alignItems: "center",
           flexDirection: "column",
-          minHeight: "90vh",
+          minHeight: "100svh",
           textAlign: "center",
           backgroundColor: "#f5f5f5",
           padding: 2,
+          pb: 0,
         }}
       >
         <Paper
@@ -62,6 +63,8 @@ export default function LoginSignUp() {
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
+            pb: 5,
+            mt: '4%',
           }}
         >
           <Typography variant="h1" gutterBottom sx={{
