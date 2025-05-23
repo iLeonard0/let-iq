@@ -9,7 +9,7 @@ import { questoesJson } from "./json/questoes";
 import { CssBaseline } from "@mui/material";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectRoute from "./screens/ProtectRoute/ProtectRoute";
-import EnterRoom from "./screens/GenericCodeRoom/GenericCodeRoom";
+import EnterRoom from "./screens/GenericCodeRoom/GenericCodeRoom"; 
 
 function App() {
   return (
@@ -38,7 +38,7 @@ function App() {
           <Route
             path="/screens/GenericCodeRoom/GenericCodeRoom"
             element={<EnterRoom />}
-          />
+          /> 
           <Route
             path="/screens/GameScreen/GameScreen"
             element={<GameScreen questoesJson={questoesJson[0]} />}
