@@ -25,10 +25,11 @@ import { db } from "../../services/firebase";
 import { useNavigate } from "react-router-dom";
 
 export default function EnterRoom() {
-  const [codigo, setCodigo] = useState("");
-  const [nome, setNome] = useState("");
+  const [codigo, setCodigo] = useState(() => localStorage.getItem("salaCodigo") || "");
+  const [nome, setNome] = useState(() => localStorage.getItem("playerName") || "");
   const [salaExiste, setSalaExiste] = useState(false);
   const [jogadores, setJogadores] = useState([]);
+  const [playerId, setPlayerId] = useState(() => localStorage.getItem("playerId") || "");
   const navigate = useNavigate();
 
   const isButtonDisabled = codigo.trim().length < 4 || nome.trim().length < 2;
@@ -39,19 +40,37 @@ export default function EnterRoom() {
 
     if (docSnap.exists()) {
       setSalaExiste(true);
+      localStorage.setItem("salaCodigo", codigo.trim());
       escutarJogadores();
-      adicionarJogador();
+      await adicionarJogador();
     } else {
       alert("Nenhuma sala com esse código.");
+      limparCacheSala();
     }
   };
 
-  const sairDaSala = () => {
+  const sairDaSala = async () => {
     setSalaExiste(false);
     setCodigo("");
     setNome("");
-    navigate("/");  
+    limparCacheSala(); 
+    if (playerId) {
+      const playersRef = collection(db, "rooms", localStorage.getItem("salaCodigo") || codigo.trim(), "players");
+      try {
+        await deleteDoc(doc(playersRef, playerId));
+      } catch {
+        //
+      }
+      localStorage.removeItem("playerId");
+    }
+    navigate("/");
   };
+
+  function limparCacheSala() {
+    localStorage.removeItem("salaCodigo");
+    localStorage.removeItem("playerName");
+    localStorage.removeItem("playerId");
+  }
 
   const adicionarJogador = async () => {
     const playersRef = collection(db, "rooms", codigo.trim(), "players");
@@ -64,17 +83,23 @@ export default function EnterRoom() {
 
     if (nameExists) {
       alert("Já existe um jogador com esse nome na sala.");
+      sairDaSala();
       return;
     }
 
-    await addDoc(playersRef, {
+    const docRef = await addDoc(playersRef, {
       name: nome.trim(),
       joinedAt: serverTimestamp(),
     });
+    setPlayerId(docRef.id);
+    localStorage.setItem("playerId", docRef.id);
+    localStorage.setItem("playerName", nome.trim());
+    localStorage.setItem("salaCodigo", codigo.trim());
   };
 
   const escutarJogadores = () => {
-    const playersRef = collection(db, "rooms", codigo.trim(), "players");
+    const salaAtual = localStorage.getItem("salaCodigo") || codigo.trim();
+    const playersRef = collection(db, "rooms", salaAtual, "players");
     const q = query(playersRef, orderBy("joinedAt"));
 
     return onSnapshot(q, (snapshot) => {
@@ -85,37 +110,30 @@ export default function EnterRoom() {
       setJogadores(lista);
     });
   };
-
+ 
   useEffect(() => {
-    if (!salaExiste || !nome.trim() || !codigo.trim()) return;
-    const playersRef = collection(db, "rooms", codigo.trim(), "players");
-    let playerId = null;
-    const q = query(playersRef, orderBy("joinedAt"));
-    const unsub = onSnapshot(q, (snapshot) => {
-      const found = snapshot.docs.find(
-        (doc) => doc.data().name === nome.trim()
-      );
-      if (found) playerId = found.id;
-    });
-    const removePlayer = async () => {
-      if (playerId) {
-        try {
-          await deleteDoc(doc(playersRef, playerId));
-        } catch {
-          console.error("Erro ao remover jogador.");
+    const cachedName = localStorage.getItem("playerName");
+    const cachedCodigo = localStorage.getItem("salaCodigo");
+    const cachedPlayerId = localStorage.getItem("playerId");
+    if (cachedName && cachedCodigo && cachedPlayerId) {
+      setNome(cachedName);
+      setCodigo(cachedCodigo);
+      setPlayerId(cachedPlayerId); 
+      (async () => {
+        const docRef = doc(db, "rooms", cachedCodigo);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setSalaExiste(true);
+          escutarJogadores();
+        } else {
+          limparCacheSala();
+          setSalaExiste(false);
+          setCodigo("");
+          setNome("");
         }
-      }
-    };
-    const handleUnload = () => {
-      removePlayer();
-    };
-    window.addEventListener("beforeunload", handleUnload);
-    return () => {
-      window.removeEventListener("beforeunload", handleUnload);
-      removePlayer();
-      unsub();
-    };
-  }, [salaExiste, nome, codigo]);
+      })();
+    }
+  }, []);
 
   return (
     <Box
@@ -238,11 +256,46 @@ export default function EnterRoom() {
             <Typography mb={2}>Aguardando o host iniciar...</Typography>
 
             <List sx={{ width: "100%", bgcolor: "background.paper", mb: 2 }}>
-              {jogadores.map((j) => (
-                <ListItem key={j.id} disablePadding>
-                  <ListItemText primary={j.name} sx={{ pl: 1 }} />
-                </ListItem>
-              ))}
+              {jogadores.map((j) => {
+                const isCurrent = j.name === nome.trim();
+                return (
+                  <ListItem key={j.id} disablePadding>
+                    <ListItemText
+                      primary={
+                        <span
+                          style={{
+                            fontWeight: isCurrent ? 700 : 400,
+                            color: isCurrent ? "#21399b" : undefined,
+                            fontSize: isCurrent ? "1.1rem" : undefined,
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                        >
+                          {isCurrent && (
+                            <span
+                              style={{
+                                display: "inline-block",
+                                width: 8,
+                                height: 8,
+                                borderRadius: "50%",
+                                background: "#21399b",
+                                marginRight: 8,
+                              }}
+                            />
+                          )}
+                          {j.name}
+                          {isCurrent && (
+                            <span style={{ marginLeft: 8, fontSize: "0.9em", color: "#21399b", fontWeight: 500 }}>
+                              (você)
+                            </span>
+                          )}
+                        </span>
+                      }
+                      sx={{ pl: 1 }}
+                    />
+                  </ListItem>
+                );
+              })}
             </List>
 
             <Button
