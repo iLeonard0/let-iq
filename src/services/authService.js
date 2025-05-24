@@ -26,3 +26,17 @@ export const resetPassword = (email) => {
 export const logout = () => {
   return signOut(auth);
 };
+
+export const getCurrentUser = () => {
+  const user = auth.currentUser
+
+  if (user) {
+    return {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName,
+    };
+  }
+
+  return null
+}
