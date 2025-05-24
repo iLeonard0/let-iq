@@ -64,7 +64,6 @@ export default function LoginSignUp() {
             justifyContent: "center",
             alignItems: "center",
             pb: 5,
-            mt: '4%',
           }}
         >
           <Typography variant="h1" gutterBottom sx={{
@@ -167,7 +166,7 @@ export default function LoginSignUp() {
             onClick={handleSignUp}
             disabled={isButtonDisabled}
             sx={{
-              backgroundColor: isButtonDisabled ? "#d3d3d3" : "#21399b",
+              backgroundColor: isButtonDisabled ? "#d3d3d3" : "#F10B5C",
               color: isButtonDisabled ? "#a9a9a9" : "white",
               width: "100%",
               borderRadius: "10px",
@@ -175,9 +174,10 @@ export default function LoginSignUp() {
               fontSize: "1rem",
               fontWeight: "bold",
               textTransform: "none",
-              transition: "background-color 0.3s ease",
+              transition: "transform 0.2s cubic-bezier(.4,2,.6,1)",
               "&:hover": {
-                backgroundColor: isButtonDisabled ? "#d3d3d3" : "#1a2e7b",
+                backgroundColor: isButtonDisabled ? "#d3d3d3" : "#d80f55",
+                transform: "scale(1.05)",
               },
             }}
             variant="contained"

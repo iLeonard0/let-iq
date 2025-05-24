@@ -1,30 +1,17 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  TextField,
-  Typography,
-  IconButton,
-  InputAdornment,
-  Paper,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
 import "./SignIn.css";
-import { useNavigate } from "react-router-dom";
 import Header from "../../components/header/Header";
+import { Box, Button, TextField, Typography, IconButton, InputAdornment, Paper, useMediaQuery, useTheme } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Link, useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../services/firebase";
-import DialogChangePassword from "./DialogChangePassword/DialogChangePassword";
 import { loginWithGoogle } from "../../services/authService";
-  
 
 export default function LoginSignUp() {
   const [nickname, setNickname] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [open, setOpen] = useState(false);
 
   const navigate = useNavigate();
   const theme = useTheme();
@@ -47,7 +34,7 @@ export default function LoginSignUp() {
       );
     }
   };
-  
+
   const handleGoogleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -59,14 +46,6 @@ export default function LoginSignUp() {
         "Erro ao fazer login. Verifique suas credenciais e tente novamente. ", error
       );
     }
-  };
-
-  const handleOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
   };
 
   const isButtonDisabled = !(nickname.trim() && password.trim());
@@ -83,7 +62,7 @@ export default function LoginSignUp() {
           minHeight: "100svh",
           textAlign: "center",
           backgroundColor: "#f5f5f5",
-          padding: isMobile ? 1 : 2 ,
+          padding: isMobile ? 1 : 2,
           pb: 0,
         }}
       >
@@ -104,21 +83,23 @@ export default function LoginSignUp() {
             mt: isMobile ? 7 : 5,
           }}
         >
-          <Typography
-            variant="h1" 
-            sx={{
-              fontSize: "2rem",
-              lineHeight: "2rem",
-              fontWeight: "700",
-              textAlign: "center",
-            }}
-          >
-            Fazer Login
-          </Typography>
+          <Box sx={{ mb: 3 }}>
+            <Typography
+              variant="h1"
+              sx={{
+                fontSize: "2rem",
+                lineHeight: "2rem",
+                fontWeight: "700",
+                textAlign: "center",
+              }}
+            >
+              Login
+            </Typography>
+          </Box>
           <Box
             sx={{
               width: "100%",
-              marginBottom: 1,
+              marginBottom: 0,
               marginTop: 2,
             }}
           >
@@ -140,9 +121,12 @@ export default function LoginSignUp() {
               className="custom-textfield"
               sx={{
                 width: "100%",
-                marginBottom: 1,
+                marginBottom: 2.5,
                 "& .MuiOutlinedInput-root": {
                   borderRadius: "5px",
+                },
+                '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#F10B5C',
                 },
               }}
             />
@@ -164,9 +148,13 @@ export default function LoginSignUp() {
               onChange={(e) => setPassword(e.target.value)}
               className="custom-textfield"
               sx={{
+                marginBottom: 0,
                 width: "100%",
                 "& .MuiOutlinedInput-root": {
                   borderRadius: "5px",
+                },
+                '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#F10B5C',
                 },
               }}
               InputProps={{
@@ -183,26 +171,28 @@ export default function LoginSignUp() {
           <Box
             sx={{
               display: "flex",
-              justifyContent: "space-between",
-              marginBottom: 1,
+              justifyContent: "flex-start",
+              alignItems: 'center',
+              marginBottom: 3,
               marginTop: 0,
+              width: '100%'
             }}
           >
-            <Typography underline="hover" sx={{ fontSize: '0.8rem', }}>
+            <Typography variant='body2' sx={{ mt: 1, fontSize: '0.8rem' }}>
               Esqueceu sua senha?
-              <Button 
-                style={{ marginLeft: "5px", textTransform: "none", fontSize: '0.8rem', }} 
-                onClick={handleOpen}
+              <Link
+                to="/screens/LoginSign/ChangePassword"
+                style={{ textDecoration: 'underline', color: '#000', fontWeight: 'bold', marginLeft: 4 }}
               >
-                Redefinir Senha...
-              </Button>
+                Redefina sua senha
+              </Link>
             </Typography>
           </Box>
           <Button
             onClick={handleLogin}
             disabled={isButtonDisabled}
             sx={{
-              backgroundColor: isButtonDisabled ? "#d3d3d3" : "#21399b",
+              backgroundColor: isButtonDisabled ? "#d3d3d3" : "#F10B5C",
               color: isButtonDisabled ? "#a9a9a9" : "white",
               width: "100%",
               borderRadius: "10px",
@@ -212,11 +202,11 @@ export default function LoginSignUp() {
               textTransform: "none",
               transition: "transform 0.2s cubic-bezier(.4,2,.6,1)",
               "&:hover": {
-                backgroundColor: isButtonDisabled ? "#d3d3d3" : "#1a2e7b",
+                backgroundColor: isButtonDisabled ? "#d3d3d3" : "#d80f55",
                 transform: "scale(1.05)",
               },
             }}
-            variant="contained"  
+            variant="contained"
           >
             Fazer Login
           </Button>
@@ -242,8 +232,9 @@ export default function LoginSignUp() {
                 top: "50%",
                 left: "50%",
                 transform: "translate(-50%, -50%)",
-                backgroundColor: "#fff", 
+                backgroundColor: "#fff",
                 padding: "0 8px",
+                fontWeight: 'bold'
               }}
             >
               ou
@@ -288,29 +279,23 @@ export default function LoginSignUp() {
           <Box
             sx={{
               display: "flex",
-              justifyContent: "space-between",
+              justifyContent: "center",
               marginBottom: 2,
               marginTop: 0,
+              width: '100%'
             }}
           >
-            <Typography sx={{ mt: 1, fontSize: '0.8rem' }} underline="hover">
-              Não tem uma conta? 
-              <Button 
-                style={{ marginLeft: "5px", textTransform: "none", fontSize: '0.8rem' }} 
-                href="/screens/LoginSignUp/LoginSignUp"
+            <Typography variant='body2' sx={{ mt: 1.5, fontSize: '0.8rem' }}>
+              Não tem uma conta?
+              <Link
+                to="/screens/LoginSignUp/LoginSignUp"
+                style={{ textDecoration: 'underline', color: '#000', fontWeight: 'bold', marginLeft: 4 }}
               >
-                Inscrever-se
-              </Button>
+                Inscreva-se
+              </Link>
             </Typography>
           </Box>
         </Paper>
-
-        <DialogChangePassword
-          onClose={handleClose}
-          open={open}
-          fullWidth
-          maxWidth="sm"
-        />
       </Box>
     </>
   );

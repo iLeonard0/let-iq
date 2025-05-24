@@ -23,7 +23,7 @@ export default function QuizEditor() {
   const [quizKey, setQuizKey] = useState("");
 
   const isQuizValid = questions.length > 0 &&
-  questions.some(q => q.question.trim() !== "" && q.answers.some(a => a.trim() !== ""));
+    questions.some(q => q.question.trim() !== "" && q.answers.some(a => a.trim() !== ""));
 
   useEffect(() => {
     if (correctAnswers.length < questions.length) {
@@ -202,6 +202,12 @@ export default function QuizEditor() {
             sx={{
               marginBottom: 3,
               borderRadius: "8px",
+              '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#F10B5C',
+              },
+              '& .MuiInputLabel-root.Mui-focused': {
+                color: '#F10B5C',
+              },
             }}
           />
           <Divider sx={{ width: '100%', mb: 3 }} />

@@ -23,6 +23,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../services/firebase";
 import { useNavigate } from "react-router-dom";
+import Header from "../../components/header/Header";
 
 export default function EnterRoom() {
   const [codigo, setCodigo] = useState(() => localStorage.getItem("salaCodigo") || "");
@@ -53,7 +54,7 @@ export default function EnterRoom() {
     setSalaExiste(false);
     setCodigo("");
     setNome("");
-    limparCacheSala(); 
+    limparCacheSala();
     if (playerId) {
       const playersRef = collection(db, "rooms", localStorage.getItem("salaCodigo") || codigo.trim(), "players");
       try {
@@ -110,15 +111,16 @@ export default function EnterRoom() {
       setJogadores(lista);
     });
   };
- 
+
   useEffect(() => {
     const cachedName = localStorage.getItem("playerName");
     const cachedCodigo = localStorage.getItem("salaCodigo");
     const cachedPlayerId = localStorage.getItem("playerId");
+
     if (cachedName && cachedCodigo && cachedPlayerId) {
       setNome(cachedName);
       setCodigo(cachedCodigo);
-      setPlayerId(cachedPlayerId); 
+      setPlayerId(cachedPlayerId);
       (async () => {
         const docRef = doc(db, "rooms", cachedCodigo);
         const docSnap = await getDoc(docRef);
@@ -136,240 +138,249 @@ export default function EnterRoom() {
   }, []);
 
   return (
-    <Box
-      sx={{
-        minHeight: "100svh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        position: "relative",
-        p: 2,
-        mt: 2,
-      }}
-    >
+    <>
+      <Header />
+
       <Box
-        component="img"
-        src="/public/letiq-logo.png"
-        alt="LetIQ Logo"
         sx={{
-          height: "120px",
-          width: "auto",
-          mt: 2,
-          mb: 1,
-          alignSelf: "center",
-        }}
-      />
-      <Paper
-        elevation={6}
-        sx={{
-          padding: 4,
-          borderRadius: "20px",
-          maxWidth: "450px",
-          width: "100%",
-          backgroundColor: "#ffffff",
-          margin: "auto",
-          mt: 3,
-          mb: 0,
+          minHeight: "100svh",
           display: "flex",
-          flexDirection: "column", 
-          justifyContent: "center",
-          boxShadow: 3,
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "flex-start",
+          position: "relative",
+          backgroundColor: "#f5f5f5",
+          p: 2,
+          mt: 2,
         }}
       >
+        <Box
+          sx={{
+            height: "120px",
+            width: "auto",
+            mt: 2,
+            mb: 1,
+            alignSelf: "center",
+          }}
+        />
+        <Paper
+          elevation={6}
+          sx={{
+            padding: 4,
+            borderRadius: "20px",
+            maxWidth: "450px",
+            width: "100%",
+            backgroundColor: "#ffffff",
+            margin: "auto",
+            mt: 3,
+            mb: 0,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            boxShadow: 3,
+          }}
+        >
+          {!salaExiste ? (
+            <>
+              <Typography variant="h1" gutterBottom sx={{
+                fontSize: "2rem",
+                lineHeight: "2rem",
+                fontWeight: "700",
+                textAlign: "center",
+                mb: 6
+              }}>
+                Entrar na Sala
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="h6" gutterBottom sx={{
+                    display: "flex",
+                    fontWeight: "bold",
+                    marginBottom: 0,
+                    fontSize: "1.2rem",
+                  }}>
+                    Nome de Usuário
+                  </Typography>
+                  <TextField
+                    value={nome}
+                    onChange={(e) => setNome(e.target.value)}
+                    sx={{ width: "100%" }}
+                  />
+
+                </Box>
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="h6" gutterBottom sx={{
+                    display: "flex",
+                    fontWeight: "bold",
+                    marginBottom: 0,
+                    fontSize: "1.2rem",
+                  }}>
+                    Código da Sala
+                  </Typography>
+                  <TextField
+                    value={codigo}
+                    onChange={(e) => setCodigo(e.target.value)}
+                    type="number"
+                    onWheel={(e) => e.target.blur()}
+                    className="custom-textfield"
+                    sx={{
+                      width: "100%",
+                      marginBottom: 0.5,
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: "5px",
+                      },
+                    }}
+                  />
+                </Box>
+                <Box>
+                  <Button
+                    variant="contained"
+                    disabled={isButtonDisabled}
+                    onClick={buscarSalaPorCodigo}
+                    sx={{
+                      backgroundColor: isButtonDisabled ? "#d3d3d3" : "#F10B5C",
+                      color: isButtonDisabled ? "#a9a9a9" : "white",
+                      width: "100%",
+                      borderRadius: "10px",
+                      padding: 1,
+                      fontWeight: "bold",
+                      textTransform: "none",
+                      transition: "transform 0.2s cubic-bezier(.4,2,.6,1)",
+                      "&:hover": {
+                        backgroundColor: isButtonDisabled ? "#d3d3d3" : "#d80f55",
+                        transform: "scale(1.05)",
+                      },
+                    }}
+                  >
+                    Entrar
+                  </Button>
+                </Box>
+              </Box>
+            </>
+          ) : (
+            <>
+              <Typography variant="h5" fontWeight="bold" mb={2}>
+                Sala {codigo}
+              </Typography>
+              <Typography mb={2}>Aguardando o host iniciar...</Typography>
+
+              <List sx={{ width: "100%", bgcolor: "background.paper", mb: 2 }}>
+                {jogadores.map((j) => {
+                  const isCurrent = j.name === nome.trim();
+                  return (
+                    <ListItem key={j.id} disablePadding>
+                      <ListItemText
+                        primary={
+                          <span
+                            style={{
+                              fontWeight: isCurrent ? 700 : 400,
+                              color: isCurrent ? "#21399b" : undefined,
+                              fontSize: isCurrent ? "1.1rem" : undefined,
+                              display: "flex",
+                              alignItems: "center",
+                            }}
+                          >
+                            {isCurrent && (
+                              <span
+                                style={{
+                                  display: "inline-block",
+                                  width: 8,
+                                  height: 8,
+                                  borderRadius: "50%",
+                                  background: "#21399b",
+                                  marginRight: 8,
+                                }}
+                              />
+                            )}
+                            {j.name}
+                            {isCurrent && (
+                              <span style={{ marginLeft: 8, fontSize: "0.9em", color: "#21399b", fontWeight: 500 }}>
+                                (você)
+                              </span>
+                            )}
+                          </span>
+                        }
+                        sx={{ pl: 1 }}
+                      />
+                    </ListItem>
+                  );
+                })}
+              </List>
+
+              <Button
+                variant="contained"
+                onClick={sairDaSala}
+                sx={{
+                  backgroundColor: "#d32f2f",
+                  color: "white",
+                  width: "100%",
+                  borderRadius: "10px",
+                  padding: 1,
+                  fontWeight: "bold",
+                  textTransform: "none",
+                  "&:hover": { backgroundColor: "#9a2424" },
+                }}
+              >
+                Sair da Sala
+              </Button>
+            </>
+          )}
+        </Paper>
         {!salaExiste ? (
-          <>
-            <Typography variant="h5" fontWeight="bold" mb={3} align="center">
-              Entrar na Sala
-            </Typography>
-
-            <Typography
-              variant="h7"
-              gutterBottom
-              sx={{
-                display: "flex",
-                fontWeight: "bold",
-                marginBottom: 0,
-              }}
-            >
-              Código da Sala
-            </Typography>
-            <TextField 
-              value={codigo}
-              onChange={(e) => setCodigo(e.target.value)}
-              type="number"
-              onWheel={(e) => e.target.blur()}
-              className="custom-textfield"
-              sx={{
-                width: "100%",
-                marginBottom: 1,
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: "5px",
-                },
-              }}
-            />
-
-            <Typography
-              variant="h7" 
-              sx={{
-                display: "flex",
-                fontWeight: "bold",
-                marginBottom: 0,
-              }}
-            >
-              Nome de Usuário
-            </Typography>
-
-            <TextField 
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-              sx={{ mb: 4, width: "100%" }}
-            />
-
+          <Box
+            sx={{
+              position: "fixed",
+              bottom: 8,
+              left: 0,
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              pointerEvents: "none",
+              zIndex: 1200,
+            }}
+          >
             <Button
-              variant="contained"
-              disabled={isButtonDisabled}
-              onClick={buscarSalaPorCodigo}
+              href="/screens/LoginSign/SignIn"
               sx={{
-                backgroundColor: isButtonDisabled ? "#d3d3d3" : "#21399b",
-                color: isButtonDisabled ? "#a9a9a9" : "white",
-                width: "100%",
-                borderRadius: "10px",
-                padding: 1,
-                fontWeight: "bold",
+                pointerEvents: "auto",
+                color: "#000",
+                textAlign: 'center',
+                background: "none",
+                fontSize: "1rem",
+                fontWeight: 500,
                 textTransform: "none",
-                transition: "transform 0.2s cubic-bezier(.4,2,.6,1)",
+                boxShadow: "none",
+                borderRadius: "8px",
+                minWidth: 0,
+                padding: 1,
+                opacity: 0.85,
+                transition:
+                  "background 0.2s, color 0.2s, transform 0.2s cubic-bezier(.4,2,.6,1)",
                 "&:hover": {
-                  backgroundColor: isButtonDisabled ? "#d3d3d3" : "#1a2e7b",
+                  background: "#f5f5f5",
+                  color: "#000",
                   transform: "scale(1.05)",
                 },
               }}
             >
-              Entrar
+              Crie seu quiz Gratuitamente aqui
             </Button>
-          </>
+          </Box>
         ) : (
-          <>
-            <Typography variant="h5" fontWeight="bold" mb={2}>
-              Sala {codigo}
-            </Typography>
-            <Typography mb={2}>Aguardando o host iniciar...</Typography>
-
-            <List sx={{ width: "100%", bgcolor: "background.paper", mb: 2 }}>
-              {jogadores.map((j) => {
-                const isCurrent = j.name === nome.trim();
-                return (
-                  <ListItem key={j.id} disablePadding>
-                    <ListItemText
-                      primary={
-                        <span
-                          style={{
-                            fontWeight: isCurrent ? 700 : 400,
-                            color: isCurrent ? "#21399b" : undefined,
-                            fontSize: isCurrent ? "1.1rem" : undefined,
-                            display: "flex",
-                            alignItems: "center",
-                          }}
-                        >
-                          {isCurrent && (
-                            <span
-                              style={{
-                                display: "inline-block",
-                                width: 8,
-                                height: 8,
-                                borderRadius: "50%",
-                                background: "#21399b",
-                                marginRight: 8,
-                              }}
-                            />
-                          )}
-                          {j.name}
-                          {isCurrent && (
-                            <span style={{ marginLeft: 8, fontSize: "0.9em", color: "#21399b", fontWeight: 500 }}>
-                              (você)
-                            </span>
-                          )}
-                        </span>
-                      }
-                      sx={{ pl: 1 }}
-                    />
-                  </ListItem>
-                );
-              })}
-            </List>
-
-            <Button
-              variant="contained"
-              onClick={sairDaSala}
-              sx={{
-                backgroundColor: "#d32f2f",
-                color: "white",
-                width: "100%",
-                borderRadius: "10px",
-                padding: 1,
-                fontWeight: "bold",
-                textTransform: "none",
-                "&:hover": { backgroundColor: "#9a2424" },
-              }}
-            >
-              Sair da Sala
-            </Button>
-          </>
-        )}
-      </Paper>
-      {!salaExiste ? (
-        <Box
-          sx={{
-            position: "fixed",
-            bottom: 8,
-            left: 0,
-            width: "100%",
-            display: "flex",
-            justifyContent: "center",
-            pointerEvents: "none",
-            zIndex: 1200,
-          }}
-        >
-          <Button
-            href="/screens/LoginSign/SignIn"
+          <Box
             sx={{
-              pointerEvents: "auto",
-              color: "#21399b",
-              background: "none",
-              fontSize: "1rem",
-              fontWeight: 500,
-              textTransform: "none",
-              boxShadow: "none",
-              borderRadius: "8px",
-              minWidth: 0,
-              padding: 0.5,
-              opacity: 0.85,
-              transition:
-                "background 0.2s, color 0.2s, transform 0.2s cubic-bezier(.4,2,.6,1)",
-              "&:hover": {
-                background: "#f5f5f5",
-                color: "#1a2e7b",
-                transform: "scale(1.05)",
-              },
+              position: "fixed",
+              bottom: 8,
+              left: 0,
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              pointerEvents: "none",
+              zIndex: 1200,
             }}
-          >
-            ...Ou crie seu próprio Quiz
-          </Button>
-        </Box>
-      ) : (
-        <Box
-          sx={{
-            position: "fixed",
-            bottom: 8,
-            left: 0,
-            width: "100%",
-            display: "flex",
-            justifyContent: "center",
-            pointerEvents: "none",
-            zIndex: 1200,
-          }}
-        />
-      )}
-    </Box>
+          />
+        )}
+      </Box>
+    </>
   );
 }

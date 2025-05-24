@@ -88,8 +88,7 @@ export default function QuizSideBar({ questions = [], currentIndex = 0, onAddQue
                   border: "1px solid rgb(214, 214, 214)",
                   boxShadow: 1,
                   borderRadius: 2,
-                  marginBottom: 2,
-
+                  marginBottom: 1.5,
                   background: '#fff'
                 }}
                 secondaryAction={
