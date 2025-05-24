@@ -30,7 +30,7 @@ export default function LoginSignUp() {
       await createUserWithEmailAndPassword(auth, email, password)
     } catch (error) {
       console.error("Erro ao criar conta:", error);
-      navigate("/");
+      navigate("/screens/LoginSign/SignIn");
     }
   }
 

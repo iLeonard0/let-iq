@@ -1,0 +1,375 @@
+import {
+  Box,
+  Button,
+  Paper,
+  TextField,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+} from "@mui/material";
+import { useState, useEffect } from "react";
+import {
+  getDoc,
+  doc,
+  collection,
+  addDoc,
+  onSnapshot,
+  query,
+  orderBy,
+  serverTimestamp,
+  deleteDoc,
+  getDocs,
+} from "firebase/firestore";
+import { db } from "../../services/firebase";
+import { useNavigate } from "react-router-dom";
+
+export default function EnterRoom() {
+  const [codigo, setCodigo] = useState(() => localStorage.getItem("salaCodigo") || "");
+  const [nome, setNome] = useState(() => localStorage.getItem("playerName") || "");
+  const [salaExiste, setSalaExiste] = useState(false);
+  const [jogadores, setJogadores] = useState([]);
+  const [playerId, setPlayerId] = useState(() => localStorage.getItem("playerId") || "");
+  const navigate = useNavigate();
+
+  const isButtonDisabled = codigo.trim().length < 4 || nome.trim().length < 2;
+
+  const buscarSalaPorCodigo = async () => {
+    const docRef = doc(db, "rooms", codigo.trim());
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      setSalaExiste(true);
+      localStorage.setItem("salaCodigo", codigo.trim());
+      escutarJogadores();
+      await adicionarJogador();
+    } else {
+      alert("Nenhuma sala com esse código.");
+      limparCacheSala();
+    }
+  };
+
+  const sairDaSala = async () => {
+    setSalaExiste(false);
+    setCodigo("");
+    setNome("");
+    limparCacheSala(); 
+    if (playerId) {
+      const playersRef = collection(db, "rooms", localStorage.getItem("salaCodigo") || codigo.trim(), "players");
+      try {
+        await deleteDoc(doc(playersRef, playerId));
+      } catch {
+        //
+      }
+      localStorage.removeItem("playerId");
+    }
+    navigate("/");
+  };
+
+  function limparCacheSala() {
+    localStorage.removeItem("salaCodigo");
+    localStorage.removeItem("playerName");
+    localStorage.removeItem("playerId");
+  }
+
+  const adicionarJogador = async () => {
+    const playersRef = collection(db, "rooms", codigo.trim(), "players");
+    const q = query(playersRef);
+    const snapshot = await getDocs(q);
+
+    const nameExists = snapshot.docs.some(
+      (doc) => doc.data().name.toLowerCase() === nome.trim().toLowerCase()
+    );
+
+    if (nameExists) {
+      alert("Já existe um jogador com esse nome na sala.");
+      sairDaSala();
+      return;
+    }
+
+    const docRef = await addDoc(playersRef, {
+      name: nome.trim(),
+      joinedAt: serverTimestamp(),
+    });
+    setPlayerId(docRef.id);
+    localStorage.setItem("playerId", docRef.id);
+    localStorage.setItem("playerName", nome.trim());
+    localStorage.setItem("salaCodigo", codigo.trim());
+  };
+
+  const escutarJogadores = () => {
+    const salaAtual = localStorage.getItem("salaCodigo") || codigo.trim();
+    const playersRef = collection(db, "rooms", salaAtual, "players");
+    const q = query(playersRef, orderBy("joinedAt"));
+
+    return onSnapshot(q, (snapshot) => {
+      const lista = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setJogadores(lista);
+    });
+  };
+ 
+  useEffect(() => {
+    const cachedName = localStorage.getItem("playerName");
+    const cachedCodigo = localStorage.getItem("salaCodigo");
+    const cachedPlayerId = localStorage.getItem("playerId");
+    if (cachedName && cachedCodigo && cachedPlayerId) {
+      setNome(cachedName);
+      setCodigo(cachedCodigo);
+      setPlayerId(cachedPlayerId); 
+      (async () => {
+        const docRef = doc(db, "rooms", cachedCodigo);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setSalaExiste(true);
+          escutarJogadores();
+        } else {
+          limparCacheSala();
+          setSalaExiste(false);
+          setCodigo("");
+          setNome("");
+        }
+      })();
+    }
+  }, []);
+
+  return (
+    <Box
+      sx={{
+        minHeight: "100svh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "flex-start",
+        position: "relative",
+        p: 2,
+        mt: 2,
+      }}
+    >
+      <Box
+        component="img"
+        src="/public/letiq-logo.png"
+        alt="LetIQ Logo"
+        sx={{
+          height: "120px",
+          width: "auto",
+          mt: 2,
+          mb: 1,
+          alignSelf: "center",
+        }}
+      />
+      <Paper
+        elevation={6}
+        sx={{
+          padding: 4,
+          borderRadius: "20px",
+          maxWidth: "450px",
+          width: "100%",
+          backgroundColor: "#ffffff",
+          margin: "auto",
+          mt: 3,
+          mb: 0,
+          display: "flex",
+          flexDirection: "column", 
+          justifyContent: "center",
+          boxShadow: 3,
+        }}
+      >
+        {!salaExiste ? (
+          <>
+            <Typography variant="h5" fontWeight="bold" mb={3} align="center">
+              Entrar na Sala
+            </Typography>
+
+            <Typography
+              variant="h7"
+              gutterBottom
+              sx={{
+                display: "flex",
+                fontWeight: "bold",
+                marginBottom: 0,
+              }}
+            >
+              Código da Sala
+            </Typography>
+            <TextField 
+              value={codigo}
+              onChange={(e) => setCodigo(e.target.value)}
+              type="number"
+              onWheel={(e) => e.target.blur()}
+              className="custom-textfield"
+              sx={{
+                width: "100%",
+                marginBottom: 1,
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: "5px",
+                },
+              }}
+            />
+
+            <Typography
+              variant="h7" 
+              sx={{
+                display: "flex",
+                fontWeight: "bold",
+                marginBottom: 0,
+              }}
+            >
+              Nome de Usuário
+            </Typography>
+
+            <TextField 
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              sx={{ mb: 4, width: "100%" }}
+            />
+
+            <Button
+              variant="contained"
+              disabled={isButtonDisabled}
+              onClick={buscarSalaPorCodigo}
+              sx={{
+                backgroundColor: isButtonDisabled ? "#d3d3d3" : "#21399b",
+                color: isButtonDisabled ? "#a9a9a9" : "white",
+                width: "100%",
+                borderRadius: "10px",
+                padding: 1,
+                fontWeight: "bold",
+                textTransform: "none",
+                transition: "transform 0.2s cubic-bezier(.4,2,.6,1)",
+                "&:hover": {
+                  backgroundColor: isButtonDisabled ? "#d3d3d3" : "#1a2e7b",
+                  transform: "scale(1.05)",
+                },
+              }}
+            >
+              Entrar
+            </Button>
+          </>
+        ) : (
+          <>
+            <Typography variant="h5" fontWeight="bold" mb={2}>
+              Sala {codigo}
+            </Typography>
+            <Typography mb={2}>Aguardando o host iniciar...</Typography>
+
+            <List sx={{ width: "100%", bgcolor: "background.paper", mb: 2 }}>
+              {jogadores.map((j) => {
+                const isCurrent = j.name === nome.trim();
+                return (
+                  <ListItem key={j.id} disablePadding>
+                    <ListItemText
+                      primary={
+                        <span
+                          style={{
+                            fontWeight: isCurrent ? 700 : 400,
+                            color: isCurrent ? "#21399b" : undefined,
+                            fontSize: isCurrent ? "1.1rem" : undefined,
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                        >
+                          {isCurrent && (
+                            <span
+                              style={{
+                                display: "inline-block",
+                                width: 8,
+                                height: 8,
+                                borderRadius: "50%",
+                                background: "#21399b",
+                                marginRight: 8,
+                              }}
+                            />
+                          )}
+                          {j.name}
+                          {isCurrent && (
+                            <span style={{ marginLeft: 8, fontSize: "0.9em", color: "#21399b", fontWeight: 500 }}>
+                              (você)
+                            </span>
+                          )}
+                        </span>
+                      }
+                      sx={{ pl: 1 }}
+                    />
+                  </ListItem>
+                );
+              })}
+            </List>
+
+            <Button
+              variant="contained"
+              onClick={sairDaSala}
+              sx={{
+                backgroundColor: "#d32f2f",
+                color: "white",
+                width: "100%",
+                borderRadius: "10px",
+                padding: 1,
+                fontWeight: "bold",
+                textTransform: "none",
+                "&:hover": { backgroundColor: "#9a2424" },
+              }}
+            >
+              Sair da Sala
+            </Button>
+          </>
+        )}
+      </Paper>
+      {!salaExiste ? (
+        <Box
+          sx={{
+            position: "fixed",
+            bottom: 8,
+            left: 0,
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+            pointerEvents: "none",
+            zIndex: 1200,
+          }}
+        >
+          <Button
+            href="/screens/LoginSign/SignIn"
+            sx={{
+              pointerEvents: "auto",
+              color: "#21399b",
+              background: "none",
+              fontSize: "1rem",
+              fontWeight: 500,
+              textTransform: "none",
+              boxShadow: "none",
+              borderRadius: "8px",
+              minWidth: 0,
+              padding: 0.5,
+              opacity: 0.85,
+              transition:
+                "background 0.2s, color 0.2s, transform 0.2s cubic-bezier(.4,2,.6,1)",
+              "&:hover": {
+                background: "#f5f5f5",
+                color: "#1a2e7b",
+                transform: "scale(1.05)",
+              },
+            }}
+          >
+            ...Ou crie seu próprio Quiz
+          </Button>
+        </Box>
+      ) : (
+        <Box
+          sx={{
+            position: "fixed",
+            bottom: 8,
+            left: 0,
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+            pointerEvents: "none",
+            zIndex: 1200,
+          }}
+        />
+      )}
+    </Box>
+  );
+}

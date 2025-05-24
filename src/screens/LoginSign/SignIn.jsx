@@ -7,6 +7,8 @@ import {
   IconButton,
   InputAdornment,
   Paper,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import "./SignIn.css";
@@ -16,6 +18,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../services/firebase";
 import DialogChangePassword from "./DialogChangePassword/DialogChangePassword";
 import { loginWithGoogle } from "../../services/authService";
+  
 
 export default function LoginSignUp() {
   const [nickname, setNickname] = useState("");
@@ -24,6 +27,8 @@ export default function LoginSignUp() {
   const [open, setOpen] = useState(false);
 
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -78,7 +83,7 @@ export default function LoginSignUp() {
           minHeight: "100svh",
           textAlign: "center",
           backgroundColor: "#f5f5f5",
-          padding: 2,
+          padding: isMobile ? 1 : 2 ,
           pb: 0,
         }}
       >
@@ -87,7 +92,7 @@ export default function LoginSignUp() {
           sx={{
             padding: 4,
             borderRadius: "20px",
-            maxWidth: "450px",
+            maxWidth: isMobile ? "90vw" : "450px",
             width: "100%",
             textAlign: "center",
             backgroundColor: "#ffffff",
@@ -96,12 +101,11 @@ export default function LoginSignUp() {
             justifyContent: "center",
             alignItems: "center",
             pb: 1,
-            mt: '5%',
+            mt: isMobile ? 7 : 5,
           }}
         >
           <Typography
-            variant="h1"
-            gutterBottom
+            variant="h1" 
             sx={{
               fontSize: "2rem",
               lineHeight: "2rem",
@@ -114,12 +118,12 @@ export default function LoginSignUp() {
           <Box
             sx={{
               width: "100%",
-              marginBottom: 2,
-              marginTop: 4,
+              marginBottom: 1,
+              marginTop: 2,
             }}
           >
             <Typography
-              variant="h6"
+              variant="h7"
               gutterBottom
               sx={{
                 display: "flex",
@@ -136,14 +140,14 @@ export default function LoginSignUp() {
               className="custom-textfield"
               sx={{
                 width: "100%",
-                marginBottom: 2,
+                marginBottom: 1,
                 "& .MuiOutlinedInput-root": {
                   borderRadius: "5px",
                 },
               }}
             />
             <Typography
-              variant="h6"
+              variant="h7"
               gutterBottom
               sx={{
                 display: "flex",
@@ -180,14 +184,14 @@ export default function LoginSignUp() {
             sx={{
               display: "flex",
               justifyContent: "space-between",
-              marginBottom: 2,
+              marginBottom: 1,
               marginTop: 0,
             }}
           >
-            <Typography underline="hover" >
+            <Typography underline="hover" sx={{ fontSize: '0.8rem', }}>
               Esqueceu sua senha?
               <Button 
-                style={{ marginLeft: "5px", textTransform: "none", fontSize: '1rem', }} 
+                style={{ marginLeft: "5px", textTransform: "none", fontSize: '0.8rem', }} 
                 onClick={handleOpen}
               >
                 Redefinir Senha...
@@ -289,10 +293,10 @@ export default function LoginSignUp() {
               marginTop: 0,
             }}
           >
-            <Typography sx={{ mt: 2 }} underline="hover">
+            <Typography sx={{ mt: 1, fontSize: '0.8rem' }} underline="hover">
               Não tem uma conta? 
               <Button 
-                style={{ marginLeft: "5px", textTransform: "none", fontSize: '1rem' }} 
+                style={{ marginLeft: "5px", textTransform: "none", fontSize: '0.8rem' }} 
                 href="/screens/LoginSignUp/LoginSignUp"
               >
                 Inscrever-se
