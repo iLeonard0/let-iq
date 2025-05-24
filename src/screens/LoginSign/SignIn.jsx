@@ -238,7 +238,7 @@ export default function LoginSignUp() {
                 top: "50%",
                 left: "50%",
                 transform: "translate(-50%, -50%)",
-                backgroundColor: "#fff", // ou a cor do fundo da sua tela
+                backgroundColor: "#fff", 
                 padding: "0 8px",
               }}
             >
