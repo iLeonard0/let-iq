@@ -5,7 +5,6 @@ import { auth } from "../../services/firebase";
 export default function LogOut() {
   const navigate = useNavigate()
 
-
   const handleLogOut = async () => {
     try {
       await auth.signout();
