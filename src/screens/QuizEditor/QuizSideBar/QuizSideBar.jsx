@@ -4,8 +4,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import React, { useEffect, useState } from "react";
 import QuizIcon from '@mui/icons-material/Quiz';
 
-export default function QuizSideBar({ questions = [], currentIndex = 0, onAddQuestion, onSelectQuestion, onDeleteQuestion, maxQuestionsReached, onSaveQuiz }) {
-  // Estado para controlar animação de entrada
+export default function QuizSideBar({ questions = [], currentIndex = 0, onAddQuestion, onSelectQuestion, onDeleteQuestion, maxQuestionsReached, onSaveQuiz, isQuizValid }) {
   const [visible, setVisible] = useState(questions.map(() => true));
 
   useEffect(() => {
@@ -75,8 +74,9 @@ export default function QuizSideBar({ questions = [], currentIndex = 0, onAddQue
             transition: 'background 0.2s',
           }}
           onClick={onSaveQuiz}
+          disabled={!isQuizValid}
         >
-          CRIAR QUIZZ
+          CRIAR QUIZ
         </Button>
         <Divider sx={{ width: '97%', mb: 1, borderColor: '#d5d5d5' }} />
         <List sx={{ width: "100%" }}>

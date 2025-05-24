@@ -19,8 +19,11 @@ export default function QuizEditor() {
   ]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState([0]);
-  const [dialogOpen, setDialogOpen] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [quizKey, setQuizKey] = useState("");
+
+  const isQuizValid = questions.length > 0 &&
+  questions.some(q => q.question.trim() !== "" && q.answers.some(a => a.trim() !== ""));
 
   useEffect(() => {
     if (correctAnswers.length < questions.length) {
@@ -153,6 +156,7 @@ export default function QuizEditor() {
           onDeleteQuestion={handleDeleteQuestion}
           maxQuestionsReached={questions.length >= 10}
           onSaveQuiz={saveQuizFirebase}
+          isQuizValid={isQuizValid}
         />
         <Box
           sx={{
