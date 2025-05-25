@@ -1,38 +1,17 @@
-import {
-  Box,
-  Button,
-  Paper,
-  TextField,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-} from "@mui/material";
+import { Box, Button, Paper, TextField, Typography, List, ListItem, ListItemText } from "@mui/material";
 import { useState, useEffect } from "react";
-import {
-  getDoc,
-  doc,
-  collection,
-  addDoc,
-  onSnapshot,
-  query,
-  orderBy,
-  serverTimestamp,
-  deleteDoc,
-  getDocs,
-} from "firebase/firestore";
+import { getDoc, doc, onSnapshot, arrayUnion, updateDoc } from "firebase/firestore";
 import { db } from "../../services/firebase";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/header/Header";
 
 export default function EnterRoom() {
-  const [codigo, setCodigo] = useState(() => localStorage.getItem("salaCodigo") || "");
-  const [nome, setNome] = useState(() => localStorage.getItem("playerName") || "");
   const [salaExiste, setSalaExiste] = useState(false);
   const [jogadores, setJogadores] = useState([]);
-  const [playerId, setPlayerId] = useState(() => localStorage.getItem("playerId") || "");
-  const navigate = useNavigate();
+  const [codigo, setCodigo] = useState(() => localStorage.getItem("salaCodigo") || "");
+  const [nome, setNome] = useState(() => localStorage.getItem("playerName") || "");
 
+  const navigate = useNavigate();
   const isButtonDisabled = codigo.trim().length < 4 || nome.trim().length < 2;
 
   const buscarSalaPorCodigo = async () => {
@@ -55,72 +34,61 @@ export default function EnterRoom() {
     setCodigo("");
     setNome("");
     limparCacheSala();
-    if (playerId) {
-      const playersRef = collection(db, "rooms", localStorage.getItem("salaCodigo") || codigo.trim(), "players");
-      try {
-        await deleteDoc(doc(playersRef, playerId));
-      } catch {
-        //
-      }
-      localStorage.removeItem("playerId");
-    }
     navigate("/");
   };
 
   function limparCacheSala() {
     localStorage.removeItem("salaCodigo");
     localStorage.removeItem("playerName");
-    localStorage.removeItem("playerId");
   }
 
   const adicionarJogador = async () => {
-    const playersRef = collection(db, "rooms", codigo.trim(), "players");
-    const q = query(playersRef);
-    const snapshot = await getDocs(q);
+    const salaRef = doc(db, "rooms", codigo.trim());
+    const salaSnap = await getDoc(salaRef);
 
-    const nameExists = snapshot.docs.some(
-      (doc) => doc.data().name.toLowerCase() === nome.trim().toLowerCase()
-    );
-
-    if (nameExists) {
-      alert("Já existe um jogador com esse nome na sala.");
-      sairDaSala();
+    if (!salaSnap.exists()) {
+      alert("Sala não encontrada.");
+      limparCacheSala();
       return;
     }
 
-    const docRef = await addDoc(playersRef, {
-      name: nome.trim(),
-      joinedAt: serverTimestamp(),
+    const jogadoresAtuais = salaSnap.data().jogadores || [];
+
+    if (jogadoresAtuais.map(j => j.toLowerCase()).includes(nome.trim().toLowerCase())) {
+      alert("Já existe um jogador com esse nome na sala.");
+      limparCacheSala();
+      return;
+    }
+
+    await updateDoc(salaRef, {
+      jogadores: arrayUnion(nome.trim()),
     });
-    setPlayerId(docRef.id);
-    localStorage.setItem("playerId", docRef.id);
+
     localStorage.setItem("playerName", nome.trim());
     localStorage.setItem("salaCodigo", codigo.trim());
   };
 
   const escutarJogadores = () => {
     const salaAtual = localStorage.getItem("salaCodigo") || codigo.trim();
-    const playersRef = collection(db, "rooms", salaAtual, "players");
-    const q = query(playersRef, orderBy("joinedAt"));
-
-    return onSnapshot(q, (snapshot) => {
-      const lista = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setJogadores(lista);
+    const salaRef = doc(db, "rooms", salaAtual);
+    
+    return onSnapshot(salaRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const jogadoresArray = docSnap.data().jogadores || [];
+        setJogadores(jogadoresArray);
+      } else {
+        setJogadores([]);
+      }
     });
   };
 
   useEffect(() => {
     const cachedName = localStorage.getItem("playerName");
     const cachedCodigo = localStorage.getItem("salaCodigo");
-    const cachedPlayerId = localStorage.getItem("playerId");
 
-    if (cachedName && cachedCodigo && cachedPlayerId) {
+    if (cachedName && cachedCodigo) {
       setNome(cachedName);
       setCodigo(cachedCodigo);
-      setPlayerId(cachedPlayerId);
       (async () => {
         const docRef = doc(db, "rooms", cachedCodigo);
         const docSnap = await getDoc(docRef);
@@ -135,6 +103,7 @@ export default function EnterRoom() {
         }
       })();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -259,53 +228,59 @@ export default function EnterRoom() {
             </>
           ) : (
             <>
-              <Typography variant="h5" fontWeight="bold" mb={2}>
+              <Typography variant="h5" fontWeight="bold" mb={1}>
                 Sala {codigo}
               </Typography>
-              <Typography mb={2}>Aguardando o host iniciar...</Typography>
-
-              <List sx={{ width: "100%", bgcolor: "background.paper", mb: 2 }}>
-                {jogadores.map((j) => {
-                  const isCurrent = j.name === nome.trim();
-                  return (
-                    <ListItem key={j.id} disablePadding>
-                      <ListItemText
-                        primary={
-                          <span
-                            style={{
-                              fontWeight: isCurrent ? 700 : 400,
-                              color: isCurrent ? "#21399b" : undefined,
-                              fontSize: isCurrent ? "1.1rem" : undefined,
-                              display: "flex",
-                              alignItems: "center",
-                            }}
-                          >
-                            {isCurrent && (
+              <Typography mb={2}>Aguardando o host iniciar a partida</Typography>
+              {(() => {
+                const current = jogadores.filter(j => j === nome.trim());
+                const others = jogadores.filter(j => j !== nome.trim());
+                const ordered = [...current, ...others];
+                return (
+                  <List sx={{ width: "100%", bgcolor: "background.paper", mb: 2 }}>
+                    {ordered.map((j) => {
+                      const isCurrent = j === nome.trim();
+                      return (
+                        <ListItem key={j} disablePadding>
+                          <ListItemText
+                            primary={
                               <span
                                 style={{
-                                  display: "inline-block",
-                                  width: 8,
-                                  height: 8,
-                                  borderRadius: "50%",
-                                  background: "#21399b",
-                                  marginRight: 8,
+                                  fontWeight: isCurrent ? 700 : 400,
+                                  color: isCurrent ? "#21399b" : undefined,
+                                  fontSize: isCurrent ? "1.1rem" : undefined,
+                                  display: "flex",
+                                  alignItems: "center",
                                 }}
-                              />
-                            )}
-                            {j.name}
-                            {isCurrent && (
-                              <span style={{ marginLeft: 8, fontSize: "0.9em", color: "#21399b", fontWeight: 500 }}>
-                                (você)
+                              >
+                                {isCurrent && (
+                                  <span
+                                    style={{
+                                      display: "inline-block",
+                                      width: 8,
+                                      height: 8,
+                                      borderRadius: "50%",
+                                      background: "#21399b",
+                                      marginRight: 8,
+                                    }}
+                                  />
+                                )}
+                                {j}
+                                {isCurrent && (
+                                  <span style={{ marginLeft: 8, fontSize: "0.9em", color: "#21399b", fontWeight: 500 }}>
+                                    (você)
+                                  </span>
+                                )}
                               </span>
-                            )}
-                          </span>
-                        }
-                        sx={{ pl: 1 }}
-                      />
-                    </ListItem>
-                  );
-                })}
-              </List>
+                            }
+                            sx={{ pl: 1 }}
+                          />
+                        </ListItem>
+                      );
+                    })}
+                  </List>
+                );
+              })()}
 
               <Button
                 variant="contained"

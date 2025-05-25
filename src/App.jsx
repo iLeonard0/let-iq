@@ -11,6 +11,7 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectRoute from "./screens/ProtectRoute/ProtectRoute";
 import EnterRoom from "./screens/GenericCodeRoom/GenericCodeRoom";
 import ChangePassword from "./screens/LoginSign/ChangePassword/ChangePassword";
+import ResumoLobby from "./screens/QuizEditor/ResumoLobby/ResumoLobby";
 
 function App() {
   return (
@@ -47,6 +48,10 @@ function App() {
           <Route
             path="/screens/LoginSign/ChangePassword"
             element={<ChangePassword />}
+          />
+          <Route
+            path="/screens/QuizEditor/ResumoLobby/:quizKey"
+            element={<ResumoLobby />}
           />
         </Routes>
       </Router>

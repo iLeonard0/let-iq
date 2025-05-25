@@ -4,15 +4,23 @@ import CloseIcon from '@mui/icons-material/Close';
 import React from 'react';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { useNavigate } from 'react-router-dom';
 
 export default function DialogQuizKey({ open, onClose, quizKey, maxWidth }) {
   const [copied, setCopied] = useState(false);
   const [showKey, setShowKey] = useState(false)
+  const navigate = useNavigate();
 
   const handleCopy = () => {
     if (quizKey) {
       navigator.clipboard.writeText(quizKey);
       setCopied(true);
+    }
+  };
+
+  const handleConfirm = () => {
+    if (quizKey) {
+      navigate(`/screens/QuizEditor/ResumoLobby/${quizKey}`);
     }
   };
 
@@ -57,6 +65,15 @@ export default function DialogQuizKey({ open, onClose, quizKey, maxWidth }) {
           disabled={copied}
         >
           {copied ? "Chave copiada" : "Copiar chave"}
+        </Button>
+        <Button
+          onClick={handleConfirm}
+          variant='contained'
+          color="success"
+          size='medium'
+          sx={{ background: '#2A2E5D' }}
+        >
+          Confirmar
         </Button>
       </DialogActions>
     </Dialog>
