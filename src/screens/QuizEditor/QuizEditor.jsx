@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { getFirestore, collection, setDoc, doc } from "firebase/firestore";
 import { Button, TextField, Box, Typography, Radio, InputAdornment, Divider, FormControl, InputLabel, Select, MenuItem, FormHelperText } from "@mui/material";
 import { getCurrentUser } from "../../services/authService";
+import { useNavigate } from "react-router-dom";
 
 export default function QuizEditor() {
   const [questions, setQuestions] = useState([
@@ -21,6 +22,8 @@ export default function QuizEditor() {
   const [correctAnswers, setCorrectAnswers] = useState([0]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [quizKey, setQuizKey] = useState("");
+
+  const navigate = useNavigate();
 
   const isQuizValid = questions.length > 0 &&
     questions.some(q => q.question.trim() !== "" && q.answers.some(a => a.trim() !== ""));
@@ -103,6 +106,7 @@ export default function QuizEditor() {
     }
 
     const quizData = {
+      status: "aguardando",
       host: {
         displayName: host.displayName,
         email: host.email,
@@ -138,6 +142,8 @@ export default function QuizEditor() {
 
       setQuizKey(roomKey);
       setDialogOpen(true);
+      // Redireciona o host para o ResumoLobby da sala criada
+      navigate(`/screens/QuizEditor/ResumoLobby/${roomKey}`);
     } catch (error) {
       console.error("Erro ao salvar no Firestore:", error.message);
     }

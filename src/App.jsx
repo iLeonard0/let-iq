@@ -5,7 +5,6 @@ import SignIn from "./screens/LoginSign/SignIn";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import GameScreen from "./screens/GameScreen/GameScreen";
 import QuizEditor from "./screens/QuizEditor/QuizEditor";
-import { questoesJson } from "./json/questoes";
 import { CssBaseline } from "@mui/material";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectRoute from "./screens/ProtectRoute/ProtectRoute";
@@ -42,8 +41,8 @@ function App() {
             element={<EnterRoom />}
           />
           <Route
-            path="/screens/GameScreen/GameScreen"
-            element={<GameScreen questoesJson={questoesJson[0]} />}
+            path="/screens/GameScreen/GameScreen/:quizKey"
+            element={<GameScreen />}
           />
           <Route
             path="/screens/LoginSign/ChangePassword"

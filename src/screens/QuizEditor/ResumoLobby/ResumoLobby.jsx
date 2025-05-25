@@ -1,50 +1,64 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Paper, List, ListItem, ListItemText, Divider, Button, CircularProgress } from "@mui/material";
+import { Box, Typography, Paper, List, ListItem, ListItemText, Divider, Button, CircularProgress, IconButton } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
 import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 import { db } from "../../../services/firebase";
 import { useAuth } from "../../../context/AuthContext";
 import Header from "../../../components/header/Header";
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 export default function ResumoLobby() {
   const { quizKey } = useParams();
   const [quizData, setQuizData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [jogadores, setJogadores] = useState([]);
+  const [showKey, setShowKey] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
 
   const handleStartQuiz = async () => {
-    if (!quizKey) return;
+    if (!quizKey || !quizData.perguntas || quizData.perguntas.length === 0) {
+      alert("Adicione perguntas antes de iniciar o quiz.");
+      return;
+    }
+
     const salaRef = doc(db, "rooms", quizKey);
-    await updateDoc(salaRef, { started: true, currentIndex: 0 });
+    await updateDoc(salaRef, { status: "started", currentIndex: 0 });
   };
 
   useEffect(() => {
     if (!quizKey) return;
+
     const salaRef = doc(db, "rooms", quizKey);
-    const unsub = onSnapshot(salaRef, (docSnap) => {
+    const unsubscribe = onSnapshot(salaRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
+
         setQuizData(data);
         setJogadores(data.jogadores || []);
 
-        // Redireciona para GameScreen sempre que started for true
-        if (data.started) {
-          navigate("/screens/GameScreen/GameScreen", {
-            replace: true,
-            state: { questoes: data, salaId: quizKey },
-          })
-        } else if (data.ended) {
+        // Removido o redirecionamento automático para o GameScreen
+        // if (data.status === "started" && data.perguntas && data.perguntas.length > 0) {
+        //   navigate(`/screens/GameScreen/GameScreen/${quizKey}`,
+        //     {
+        //       replace: true,
+        //       state: { questoes: data, salaId: quizKey },
+        //     }
+        //   );
+        // } else 
+        if (data.status === "ended") {
           navigate("/screens/GameScreen/ResultadosQuiz", {
             replace: true,
             state: { quizData: data, jogadores: data.jogadores || [] },
-          })
+          });
         }
       }
+
       setLoading(false);
     });
-    return () => unsub();
+
+    return () => unsubscribe();
   }, [quizKey, navigate]);
 
   if (loading) {
@@ -90,77 +104,91 @@ export default function ResumoLobby() {
     );
   }
 
+  if (quizData.status === "started") {
+    return (
+      <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" minHeight="100vh">
+        <CircularProgress />
+        <Typography sx={{ mt: 2 }}>Iniciando o jogo...</Typography>
+      </Box>
+    );
+  }
+
   return (
-    <Box sx={{ minHeight: "100vh", background: "#f5f5f5", overflow: "auto" }}>
+    <Box sx={{ minHeight: "100vh", background: "#f5f5f5", overflow: "auto", mt: 3 }}>
       <Header />
-      <Box display="flex" flexDirection="column" alignItems="center" justifyContent="flex-start" pt={4} sx={{ mt: { xs: 8, sm: 10 }, width: '100vw', overflow: 'hidden' }}>
+      <Box display="flex" flexDirection="column" alignItems="center" justifyContent="flex-start" pt={4} sx={{ mt: { xs: 8, sm: 10 }, width: '100vw', overflow: 'hidden', pr: 2, pl: 2, pb: 2 }}>
         <Paper sx={{ p: 4, borderRadius: 4, minWidth: 350, maxWidth: 600, width: "100%", mb: 4, overflow: 'visible' }}>
           <Typography variant="h4" fontWeight={700} mb={2} color="#000">
-            Resumo do Quiz
+            Sala de Espera
           </Typography>
-          <Typography variant="subtitle1" mb={2}>
-            Chave da sala: <b>{quizKey}</b>
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 0.5 }}>
+            <Typography variant="subtitle1">
+              Chave da sala: <b>{showKey ? quizKey : '******'}</b>
+            </Typography>
+            <IconButton size="small" onClick={() => setShowKey((v) => !v)}>
+              {showKey ? <VisibilityOffIcon /> : <VisibilityIcon />}
+            </IconButton>
+          </Box>
           <Divider sx={{ mb: 2 }} />
-          <Typography variant="h6" mb={1}>
-            Perguntas:
-          </Typography>
-          <List dense>
-            {quizData.perguntas && quizData.perguntas.length > 0 ? (
-              quizData.perguntas.map((q, idx) => (
-                <ListItem key={idx}>
-                  <ListItemText primary={`Q${idx + 1}: ${q.pergunta}`} />
-                </ListItem>
-              ))
-            ) : (
-              <Typography color="textSecondary">Nenhuma pergunta cadastrada.</Typography>
-            )}
-          </List>
-          <Divider sx={{ my: 2 }} />
           <Typography variant="h6" mb={1}>
             Jogadores aguardando:
           </Typography>
           <List dense>
             {jogadores.length > 0 ? (
-              jogadores.map((j, idx) => (
-                <ListItem key={idx} sx={{
-                  borderRadius: 2,
-                  mb: 1,
-                  background: '#fff',
-                  boxShadow: 0,
-                  border: '1px solid #e3e3e3',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  pl: 2,
-                }}>
-                  <Box sx={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: '50%',
-                    background: '#2A2E5D',
-                    mr: 1,
-                  }} />
-                  <ListItemText
-                    primary={<Typography fontWeight={600} color="#2A2E5D">{j}</Typography>}
-                  />
-                </ListItem>
-              ))
+              jogadores.map((j, idx) => {
+                const playerName = localStorage.getItem("playerName");
+                const isCurrent = j === playerName;
+                return (
+                  <ListItem key={idx} sx={{
+                    borderRadius: 2,
+                    mb: 1,
+                    background: '#fff',
+                    boxShadow: 0,
+                    border: '1px solid #e3e3e3',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    pl: 2,
+                  }}>
+                    <Box sx={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: '50%',
+                      background: '#2A2E5D',
+                      mr: 1,
+                    }} />
+                    <ListItemText
+                      primary={
+                        <Typography fontWeight={600} color="#2A2E5D" component="span">
+                          {j} {isCurrent && <span style={{ color: '#F10B5C', fontWeight: 600, marginLeft: 8 }}>(você)</span>}
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                );
+              })
             ) : (
               <Typography color="textSecondary" sx={{ px: 2, py: 1 }}>Nenhum jogador conectado ainda.</Typography>
             )}
           </List>
+          <Divider sx={{ mt: 1 }} />
           <Box sx={{ display: "flex", justifyContent: "center" }}>
-            <Button
-              variant="contained"
-              sx={{ mt: 3, borderRadius: 2, backgroundColor: "#F10B5C" }}
-              onClick={handleStartQuiz}
-              disabled={
-                !quizData || !user || quizData.host?.uid !== user.uid || jogadores.length === 0
-              }
-            >
-              Iniciar Quiz
-            </Button>
+            {quizData && user && quizData.host?.uid === user.uid ? (
+              <Button
+                variant="contained"
+                sx={{ mt: 3, borderRadius: 2, backgroundColor: "#F10B5C" }}
+                onClick={handleStartQuiz}
+                disabled={
+                  !quizData || !user || jogadores.length === 0
+                }
+              >
+                Iniciar Quiz
+              </Button>
+            ) : (
+              <Typography variant="body1" sx={{ mt: 3, color: '#000', fontWeight: 600, textAlign: 'center' }}>
+                Aguarde o Host iniciar a partida
+              </Typography>
+            )}
           </Box>
         </Paper>
       </Box>
