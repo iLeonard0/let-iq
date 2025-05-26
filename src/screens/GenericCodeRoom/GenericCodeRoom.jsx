@@ -1,38 +1,70 @@
-import { Box, Button, Paper, TextField, Typography } from "@mui/material";
+import { Box, Button, Paper, TextField, Typography, Snackbar, Alert } from "@mui/material";
 import { useState } from "react";
 import { getDoc, doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { db } from "../../services/firebase";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/header/Header";
+import { useAuth } from "../../context/AuthContext";
 
 export default function EnterRoom() {
-  const [codigo, setCodigo] = useState(() => localStorage.getItem("salaCodigo") || "");
-  const [nome, setNome] = useState(() => localStorage.getItem("playerName") || "");
+  const [codigo, setCodigo] = useState("");
+  const [nome, setNome] = useState("");
   const [nomeErro, setNomeErro] = useState("");
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error' });
   const navigate = useNavigate();
-  const isButtonDisabled = codigo.trim().length < 4 || nome.trim().length < 2;
+  const { user } = useAuth();
+  const isButtonDisabled = codigo.trim().length < 5 || nome.trim().length < 2;
 
   const buscarSalaPorCodigo = async () => {
     const docRef = doc(db, "rooms", codigo.trim());
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      const jogadoresAtuais = docSnap.data().jogadores || [];
-      if (jogadoresAtuais.map(j => j.toLowerCase()).includes(nome.trim().toLowerCase())) {
+      const data = docSnap.data();
+
+      if (data.status === "started") {
+        setSnackbar({ open: true, message: "Não é possível entrar em uma sala já iniciada.", severity: 'error' });
+        return;
+      }
+
+      const jogadoresAtuais = data.jogadores || [];
+
+      if (jogadoresAtuais.map(j => (j.nome || j).toLowerCase()).includes(nome.trim().toLowerCase())) {
         setNomeErro("Já existe um jogador com esse usuário.");
         return;
       }
-      // Adiciona o jogador ao array no Firestore
+
+      // Gera UID do usuário (autenticado ou convidado)
+      let jogadorUid = null;
+      if (user && user.uid) {
+        jogadorUid = user.uid;
+      } else {
+        // Se já existe um UID para este nome nesta sala, reutiliza, senão gera novo
+        const jogadorExistente = jogadoresAtuais.find(j => (j.nome || j) === nome.trim());
+        if (jogadorExistente && jogadorExistente.uid) {
+          jogadorUid = jogadorExistente.uid;
+        } else {
+          jogadorUid = crypto.randomUUID();
+        }
+      }
+
+      // Adiciona o jogador sempre com uid
+      const jogador = { nome: nome.trim(), pontos: 0, uid: jogadorUid };
       await updateDoc(docRef, {
-        jogadores: arrayUnion(nome.trim())
+        jogadores: arrayUnion(jogador)
       });
-      localStorage.setItem("salaCodigo", codigo.trim());
-      localStorage.setItem("playerName", nome.trim());
+
+      // Apenas para identificar o usuário atual na sessão (para mostrar "você" no lobby)
+      sessionStorage.setItem("currentUid", jogadorUid);
+      sessionStorage.setItem("playerName", nome.trim());
+      sessionStorage.setItem("salaCodigo", codigo.trim());
+      
       navigate(`/screens/QuizEditor/ResumoLobby/${codigo.trim()}`);
     } else {
-      alert("Nenhuma sala com esse código.");
-      localStorage.removeItem("salaCodigo");
-      localStorage.removeItem("playerName");
+      setSnackbar({ open: true, message: "Nenhuma sala com esse código.", severity: 'error' });
+      sessionStorage.removeItem("salaCodigo");
+      sessionStorage.removeItem("playerName");
+      sessionStorage.removeItem("currentUid");
     }
   };
 
@@ -42,7 +74,6 @@ export default function EnterRoom() {
       <Box
         sx={{
           minHeight: "100vh",
-          height: "100vh",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -50,7 +81,6 @@ export default function EnterRoom() {
           position: "relative",
           backgroundColor: "#f5f5f5",
           p: 2,
-          overflow: "auto"
         }}
       >
         <Paper
@@ -190,6 +220,16 @@ export default function EnterRoom() {
           </Button>
         </Box>
       </Box>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3500}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 }

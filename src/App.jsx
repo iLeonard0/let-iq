@@ -11,6 +11,7 @@ import ProtectRoute from "./screens/ProtectRoute/ProtectRoute";
 import EnterRoom from "./screens/GenericCodeRoom/GenericCodeRoom";
 import ChangePassword from "./screens/LoginSign/ChangePassword/ChangePassword";
 import ResumoLobby from "./screens/QuizEditor/ResumoLobby/ResumoLobby";
+import PontuacaoScreen from "./screens/RankScreen/PontuacaoScreen";
 
 function App() {
   return (
@@ -51,6 +52,10 @@ function App() {
           <Route
             path="/screens/QuizEditor/ResumoLobby/:quizKey"
             element={<ResumoLobby />}
+          />
+          <Route
+            path="/pontuacao"
+            element={<PontuacaoScreen />}
           />
         </Routes>
       </Router>

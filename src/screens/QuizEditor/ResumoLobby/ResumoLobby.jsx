@@ -25,6 +25,9 @@ export default function ResumoLobby() {
 
     const salaRef = doc(db, "rooms", quizKey);
     await updateDoc(salaRef, { status: "started", currentIndex: 0 });
+    navigate(`/screens/GameScreen/GameScreen/${quizKey}`, {
+      state: { questoes: quizData, salaId: quizKey }
+    });
   };
 
   useEffect(() => {
@@ -34,20 +37,16 @@ export default function ResumoLobby() {
     const unsubscribe = onSnapshot(salaRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
-
+        
         setQuizData(data);
         setJogadores(data.jogadores || []);
 
-        // Removido o redirecionamento automático para o GameScreen
-        // if (data.status === "started" && data.perguntas && data.perguntas.length > 0) {
-        //   navigate(`/screens/GameScreen/GameScreen/${quizKey}`,
-        //     {
-        //       replace: true,
-        //       state: { questoes: data, salaId: quizKey },
-        //     }
-        //   );
-        // } else 
-        if (data.status === "ended") {
+        if (data.status === "started" && data.perguntas && data.perguntas.length > 0) {
+          navigate(`/screens/GameScreen/GameScreen/${quizKey}`, {
+            state: { questoes: data, salaId: quizKey },
+            replace: true
+          })
+        } else if (data.status === "ended") {
           navigate("/screens/GameScreen/ResultadosQuiz", {
             replace: true,
             state: { quizData: data, jogadores: data.jogadores || [] },
@@ -104,15 +103,6 @@ export default function ResumoLobby() {
     );
   }
 
-  if (quizData.status === "started") {
-    return (
-      <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" minHeight="100vh">
-        <CircularProgress />
-        <Typography sx={{ mt: 2 }}>Iniciando o jogo...</Typography>
-      </Box>
-    );
-  }
-
   return (
     <Box sx={{ minHeight: "100vh", background: "#f5f5f5", overflow: "auto", mt: 3 }}>
       <Header />
@@ -136,8 +126,9 @@ export default function ResumoLobby() {
           <List dense>
             {jogadores.length > 0 ? (
               jogadores.map((j, idx) => {
-                const playerName = localStorage.getItem("playerName");
-                const isCurrent = j === playerName;
+                const currentUid = sessionStorage.getItem("currentUid") || (user && user.uid);
+                const nomeJogador = j.nome || j;
+                const isCurrent = j.uid === currentUid;
                 return (
                   <ListItem key={idx} sx={{
                     borderRadius: 2,
@@ -160,7 +151,7 @@ export default function ResumoLobby() {
                     <ListItemText
                       primary={
                         <Typography fontWeight={600} color="#2A2E5D" component="span">
-                          {j} {isCurrent && <span style={{ color: '#F10B5C', fontWeight: 600, marginLeft: 8 }}>(você)</span>}
+                          {nomeJogador} {isCurrent && <span style={{ color: '#F10B5C', fontWeight: 600, marginLeft: 8 }}>(você)</span>}
                         </Typography>
                       }
                     />

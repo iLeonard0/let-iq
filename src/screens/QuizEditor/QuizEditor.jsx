@@ -117,7 +117,9 @@ export default function QuizEditor() {
         pergunta: questions.question,
         alternativas: questions.answers,
         respostaCorreta: correctAnswers[index],
-        tempo: questions.timer
+        tempo: questions.timer,
+        mostrarResposta: false,
+        id: questions.id || `${index}` 
       }))
     };
 
