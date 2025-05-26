@@ -61,7 +61,9 @@ export default function QuizHistoryDialog({ open, onClose, onSelectQuiz }) {
                           try {
                             await deleteDoc(doc(getFirestore(), "rooms", quiz.id));
                             setQuizzes(qs => qs.filter(q => q.id !== quiz.id));
-                          } catch {}
+                          } catch {
+                            console.error('Erro ao excluir o quiz');
+                          }
                         }
                       }}
                       sx={{ minWidth: 0, color: '#F10B5C' }}
