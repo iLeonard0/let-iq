@@ -112,7 +112,7 @@ export default function LoginSignUp() {
                 marginBottom: 0,
               }}
             >
-              Nome de usuário
+              Email
             </Typography>
             <TextField
               variant="outlined"

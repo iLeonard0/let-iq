@@ -3,9 +3,12 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import React, { useEffect, useState } from "react";
 import QuizIcon from '@mui/icons-material/Quiz';
+import QuizHistoryDialog from "../../../components/QuizHistoryDialog";
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 
-export default function QuizSideBar({ questions = [], currentIndex = 0, onAddQuestion, onSelectQuestion, onDeleteQuestion, maxQuestionsReached, onSaveQuiz, isQuizValid }) {
+export default function QuizSideBar({ questions = [], currentIndex = 0, onAddQuestion, onSelectQuestion, onDeleteQuestion, maxQuestionsReached, onSaveQuiz, isQuizValid, onSelectQuizHistory }) {
   const [visible, setVisible] = useState(questions.map(() => true));
+  const [quizHistoryOpen, setQuizHistoryOpen] = useState(false);
 
   useEffect(() => {
     if (questions.length > visible.length) {
@@ -37,6 +40,28 @@ export default function QuizSideBar({ questions = [], currentIndex = 0, onAddQue
           alignItems: "center",
         }}
       >
+        <Button
+          variant="outlined"
+          fullWidth
+          sx={{
+            marginBottom: 2,
+            color: '#F10B5C',
+            borderColor: '#F10B5C',
+            '&:hover': { borderColor: '#d80f55', color: '#d80f55', background: '#FEECF2' }
+          }}
+          onClick={() => setQuizHistoryOpen(true)}
+          startIcon={<ManageSearchIcon />}
+        >
+          Ver quizzes criados
+        </Button>
+        <QuizHistoryDialog
+          open={quizHistoryOpen}
+          onClose={() => setQuizHistoryOpen(false)}
+          onSelectQuiz={(quiz) => {
+            setQuizHistoryOpen(false);
+            onSelectQuizHistory(quiz);
+          }}
+        />
         <Tooltip
           title={maxQuestionsReached ? 'Limite máximo de perguntas atingido' : ''}
           disableHoverListener={!maxQuestionsReached}

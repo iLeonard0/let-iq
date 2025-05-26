@@ -41,28 +41,25 @@ export default function EnterRoom() {
         return;
       }
 
-      // Gera UID do usuário (autenticado ou convidado)
       let jogadorUid = null;
       if (user && user.uid) {
         jogadorUid = user.uid;
       } else {
-        // Se já existe um UID para este nome nesta sala, reutiliza, senão gera novo
         const jogadorExistente = jogadoresAtuais.find(j => (j.nome || j) === nome.trim());
+
         if (jogadorExistente && jogadorExistente.uid) {
           jogadorUid = jogadorExistente.uid;
         } else {
-          // jogadorUid = crypto.randomUUID();
-          jogadorUid = uuidv4(); // Gera um novo UUID
+          jogadorUid = uuidv4(); 
         }
       }
 
-      // Adiciona o jogador sempre com uid
+      
       const jogador = { nome: nome.trim(), pontos: 0, uid: jogadorUid };
       await updateDoc(docRef, {
         jogadores: arrayUnion(jogador)
       });
 
-      // Apenas para identificar o usuário atual na sessão (para mostrar "você" no lobby)
       sessionStorage.setItem("currentUid", jogadorUid);
       sessionStorage.setItem("playerName", nome.trim());
       sessionStorage.setItem("salaCodigo", codigo.trim());
@@ -224,7 +221,7 @@ export default function EnterRoom() {
               },
             }}
           >
-            Crie seu quiz Gratuitamente aqui
+            Crie seu quiz gratuitamente aqui
           </Button>
         </Box>
       </Box>

@@ -3,7 +3,6 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from '@mui/icons-material/Remove';
 import Header from "../../components/header/Header";
 import QuizSideBar from "./QuizSideBar/QuizSideBar";
-import DialogQuizKey from "./DialogQuizKey/DialogQuizKey";
 import { useEffect, useState } from "react";
 import { getFirestore, collection, setDoc, doc } from "firebase/firestore";
 import { Button, TextField, Box, Typography, Radio, InputAdornment, Divider, FormControl, InputLabel, Select, MenuItem, FormHelperText } from "@mui/material";
@@ -20,8 +19,7 @@ export default function QuizEditor() {
   ]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState([0]);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [quizKey, setQuizKey] = useState("");
+  const [selectedSalaId, setSelectedSalaId] = useState(null);
 
   const navigate = useNavigate();
 
@@ -130,27 +128,38 @@ export default function QuizEditor() {
     return Math.floor(10000 + Math.random() * 90000).toString();
   };
 
+  const handleSelectQuizHistory = (quiz) => {
+    if (quiz && quiz.perguntas) {
+      setQuestions(quiz.perguntas.map(q => ({
+        question: q.pergunta,
+        answers: q.alternativas,
+        timer: q.tempo,
+        id: q.id
+      })));
+      setCorrectAnswers(quiz.perguntas.map(q => q.respostaCorreta));
+      setCurrentIndex(0);
+      setSelectedSalaId(quiz.salaId || quiz.id);
+    }
+  };
+
+
   const saveQuizFirebase = async () => {
     try {
       const quizData = generateQuizJson();
-
-      if (!quizData) return
-
-      const roomKey = generateRoomKey();
+      if (!quizData) return;
       const db = getFirestore();
+      let roomKey = selectedSalaId;
+      if (!roomKey) {
+        roomKey = generateRoomKey();
+      }
       const collectionRef = collection(db, "rooms");
       const docRef = doc(collectionRef, roomKey);
       await setDoc(docRef, quizData);
-
-      setQuizKey(roomKey);
-      setDialogOpen(true);
-      // Redireciona o host para o ResumoLobby da sala criada
       navigate(`/screens/QuizEditor/ResumoLobby/${roomKey}`);
     } catch (error) {
       console.error("Erro ao salvar no Firestore:", error.message);
     }
   };
-
 
   return (
     <Box display="flex" width="100%" height="100vh" flexDirection="column" overflow="auto" sx={{ background: '#fff' }}>
@@ -165,6 +174,7 @@ export default function QuizEditor() {
           maxQuestionsReached={questions.length >= 10}
           onSaveQuiz={saveQuizFirebase}
           isQuizValid={isQuizValid}
+          onSelectQuizHistory={handleSelectQuizHistory}
         />
         <Box
           sx={{
@@ -292,12 +302,6 @@ export default function QuizEditor() {
             </Button>
           </Box>
         </Box>
-        <DialogQuizKey
-          open={dialogOpen}
-          onClose={() => setDialogOpen(false)}
-          quizKey={quizKey}
-          maxWidth="xs"
-        />
       </Box>
     </Box>
   );

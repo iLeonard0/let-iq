@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Box, Button, TextField, Typography, IconButton, InputAdornment, Paper } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import "./LoginSignUp.css";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/header/Header";
 import { createUserWithEmailAndPassword } from "firebase/auth";

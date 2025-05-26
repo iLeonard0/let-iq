@@ -7,7 +7,7 @@ import GameScreen from "./screens/GameScreen/GameScreen";
 import QuizEditor from "./screens/QuizEditor/QuizEditor";
 import { CssBaseline } from "@mui/material";
 import { AuthProvider } from "./context/AuthContext";
-import ProtectRoute from "./screens/ProtectRoute/ProtectRoute";
+import ProtectRoute from "./services/ProtectRoute/ProtectRoute";
 import EnterRoom from "./screens/GenericCodeRoom/GenericCodeRoom";
 import ChangePassword from "./screens/LoginSign/ChangePassword/ChangePassword";
 import ResumoLobby from "./screens/QuizEditor/ResumoLobby/ResumoLobby";

@@ -7,6 +7,7 @@ import { useAuth } from "../../../context/AuthContext";
 import Header from "../../../components/header/Header";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 export default function ResumoLobby() {
   const { quizKey } = useParams();
