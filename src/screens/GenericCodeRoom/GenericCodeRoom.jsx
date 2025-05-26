@@ -6,6 +6,13 @@ import { useNavigate } from "react-router-dom";
 import Header from "../../components/header/Header";
 import { useAuth } from "../../context/AuthContext";
 
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 export default function EnterRoom() {
   const [codigo, setCodigo] = useState("");
   const [nome, setNome] = useState("");
@@ -44,7 +51,8 @@ export default function EnterRoom() {
         if (jogadorExistente && jogadorExistente.uid) {
           jogadorUid = jogadorExistente.uid;
         } else {
-          jogadorUid = crypto.randomUUID();
+          // jogadorUid = crypto.randomUUID();
+          jogadorUid = uuidv4(); // Gera um novo UUID
         }
       }
 
