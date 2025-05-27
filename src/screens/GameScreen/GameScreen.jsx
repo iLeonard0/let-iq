@@ -272,7 +272,24 @@ export default function GameScreen() {
               position: 'relative',
             }}
           >
-            <Typography variant="h6">{perguntaAtual.pergunta}</Typography>
+            <Typography 
+              variant="h6"
+              sx={{
+                wordBreak: 'break-word',
+                whiteSpace: 'pre-line',
+                width: '100%',
+                fontSize: { xs: '1.1rem', sm: '1.25rem' },
+                textAlign: 'center',
+                overflowWrap: 'break-word',
+                lineHeight: 1.3,
+                '@media (max-width: 600px)': {
+                  fontSize: '1rem',
+                  padding: 0,
+                },
+              }}
+            >
+              {perguntaAtual.pergunta}
+            </Typography>
             {podeMostrarResposta && !isHost && (
               <Box
                 sx={{
