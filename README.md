@@ -2,6 +2,13 @@
 
 **Let-IQ** é um projeto desenvolvido com React e Vite que utiliza as bibliotecas do Material-UI (MUI) para criar uma interface moderna e responsiva. Este projeto também inclui o React Router para gerenciar a navegação e configurações de linting para manter o código limpo e padronizado.
 
+## Atribuição de tarefas
+
+No projeto, as atribuições de tarefas foram organizadas da seguinte forma:
+
+- Leonardo Folle e Eduardo Fassini: Responsáveis pelo desenvolvimento do projeto, incluindo as integrações com o banco de dados e a criação do aplicativo.
+- Juan Felipe e João Victor: Encargos relacionados à criação do protótipo no Figma, buscando garantir que a interface fosse a mais fiel possível ao projeto desenvolvido, tanto em design quanto em estrutura.
+
 ## Tecnologias e Ferramentas
 
 ### Frameworks e Bibliotecas
