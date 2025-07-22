@@ -12,19 +12,23 @@ No projeto, as atribuições de tarefas foram organizadas da seguinte forma:
 ## Tecnologias e Ferramentas
 
 ### Frameworks e Bibliotecas
+
 - **React**: Uma biblioteca JavaScript para construir interfaces de usuário.
 - **React DOM**: Renderiza componentes React no DOM.
 - **Vite**: Um empacotador de módulos rápido e moderno para desenvolvimento de front-end.
 
 ### Gerenciamento de Estilo
+
 - **@mui/material**: Biblioteca de componentes UI para React.
 - **@mui/icons-material**: Ícones integrados para uso com Material-UI.
 - **@emotion/react** e **@emotion/styled**: Utilizadas para estilização dinâmica em Material-UI.
 
 ### Navegação
+
 - **React Router DOM**: Biblioteca para criação de rotas e navegação entre páginas no React.
 
 ### Desenvolvimento e Qualidade de Código
+
 - **ESLint**: Ferramenta de linting para identificar problemas no código.
 - **eslint-plugin-react-hooks**: Garante boas práticas com hooks do React.
 - **eslint-plugin-react-refresh**: Suporte para React Refresh no desenvolvimento.
@@ -43,14 +47,18 @@ No projeto, as atribuições de tarefas foram organizadas da seguinte forma:
 
 1. Certifique-se de ter o **Node.js** e **npm** instalados.
 2. Clone este repositório:
+
    ```bash
    git clone https://github.com/seu-usuario/let-iq.git
    cd let-iq
 3. Instale as dependências:
+
    ```bash
    npm install
    ```
+
 4. Inicie o Servidor de Desenvolvimento:
+
    ```bash
    npm run dev
    ```
